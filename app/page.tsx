@@ -19,9 +19,7 @@ const FALLBACK_NAME = "Yaphet Lemiesa";
 const FALLBACK_BIO = "Student interested in hardware, AI, and robotics.";
 const FALLBACK_URL = "https://github.com/ylemiesa57";
 
-// TODO: set the real LinkedIn URL once provided -- left blank so the
-// footer link doesn't render a wrong/placeholder address in the meantime.
-const LINKEDIN_URL = "";
+const LINKEDIN_URL = "https://www.linkedin.com/in/yaphet-lemiesa-606603287/";
 const CONTACT_EMAIL = "yaphkl75@mit.edu";
 
 export default async function Home() {
