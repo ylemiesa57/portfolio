@@ -41,6 +41,7 @@ export interface GithubRepo {
   language: string | null;
   stargazers_count: number;
   forks_count: number;
+  watchers_count: number;
   pushed_at: string;
   fork: boolean;
   archived: boolean;
@@ -69,6 +70,14 @@ export async function getUser(): Promise<GithubUser | null> {
   return safeFetch<GithubUser>(`/users/${USERNAME}`);
 }
 
+// Weights stars highest, forks next, watchers last -- all three are genuine
+// external signal, vs. pushed_at which just says "recently touched." Ties
+// (common: most repos here have 0 of all three right now) fall back to
+// most recently pushed.
+export function popularityScore(repo: GithubRepo): number {
+  return repo.stargazers_count * 3 + repo.forks_count * 2 + repo.watchers_count;
+}
+
 export async function getRepos(): Promise<GithubRepo[]> {
   const repos = await safeFetch<GithubRepo[]>(
     `/users/${USERNAME}/repos?per_page=100&type=owner&sort=pushed`
@@ -77,10 +86,8 @@ export async function getRepos(): Promise<GithubRepo[]> {
   return repos
     .filter((r) => !r.fork && !r.archived)
     .sort((a, b) => {
-      // Surface starred work first, then most recently pushed.
-      if (b.stargazers_count !== a.stargazers_count) {
-        return b.stargazers_count - a.stargazers_count;
-      }
+      const scoreDiff = popularityScore(b) - popularityScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
       return new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime();
     });
 }

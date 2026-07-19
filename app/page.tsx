@@ -6,9 +6,13 @@ import {
   getRepos,
   getUser,
 } from "@/lib/github";
+import { awards, initiatives, publications } from "@/lib/content";
 import TitleBar from "@/components/TitleBar";
 import Hero from "@/components/Hero";
+import Awards from "@/components/Awards";
+import Publications from "@/components/Publications";
 import RepoGrid from "@/components/RepoGrid";
+import Initiatives from "@/components/Initiatives";
 import ActivitySignal from "@/components/ActivitySignal";
 import Footer from "@/components/Footer";
 import { TraceNode } from "@/components/CircuitTrace";
@@ -56,7 +60,10 @@ export default async function Home() {
         languageCount={languageCount}
         domains={domains}
       />
+      <Awards items={awards} />
+      <Publications items={publications} />
       <RepoGrid repos={repos} />
+      <Initiatives items={initiatives} />
       <ActivitySignal events={events} />
       <Footer githubUrl={user?.html_url ?? FALLBACK_URL} />
     </div>

@@ -142,3 +142,43 @@
   border-top: 1px dashed var(--line-cyan-dim);
   padding-top: 10px;
 }
+
+.more {
+  margin-top: 24px;
+  border-top: 1px dashed var(--line-cyan-dim);
+  padding-top: 20px;
+}
+
+.moreSummary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--signal-amber);
+  width: fit-content;
+  padding: 8px 0;
+  transition: color 160ms ease;
+}
+
+.moreSummary::-webkit-details-marker {
+  display: none;
+}
+
+.moreSummary::before {
+  content: "▸ ";
+}
+
+.more[open] .moreSummary::before {
+  content: "▾ ";
+}
+
+.moreSummary:hover,
+.moreSummary:focus-visible {
+  color: var(--paper);
+}
+
+.moreGrid {
+  margin-top: 20px;
+}
