@@ -57,6 +57,7 @@ export default async function Home() {
         repoCount={user?.public_repos ?? repos.length}
         languageCount={languageCount}
         domains={domains}
+        photoSrc="/photo.jpg"
       />
       <Awards items={awards} />
       <Publications items={publications} />
