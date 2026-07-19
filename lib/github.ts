@@ -48,11 +48,6 @@ export interface GithubRepo {
   topics: string[];
 }
 
-export interface GithubEvent {
-  type: string;
-  created_at: string;
-}
-
 async function safeFetch<T>(path: string): Promise<T | null> {
   try {
     const res = await fetch(`${API}${path}`, {
@@ -90,13 +85,6 @@ export async function getRepos(): Promise<GithubRepo[]> {
       if (scoreDiff !== 0) return scoreDiff;
       return new Date(b.pushed_at).getTime() - new Date(a.pushed_at).getTime();
     });
-}
-
-export async function getRecentEvents(): Promise<GithubEvent[]> {
-  const events = await safeFetch<GithubEvent[]>(
-    `/users/${USERNAME}/events/public?per_page=100`
-  );
-  return events ?? [];
 }
 
 // Buckets a repo's language/topics into one of Kiya's real domain areas, so

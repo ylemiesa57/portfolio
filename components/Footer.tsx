@@ -3,9 +3,11 @@ import styles from "./Footer.module.css";
 export default function Footer({
   githubUrl,
   email,
+  linkedinUrl,
 }: {
   githubUrl: string;
   email?: string;
+  linkedinUrl?: string;
 }) {
   return (
     <footer className={styles.footer}>
@@ -22,6 +24,16 @@ export default function Footer({
         >
           GITHUB ↗
         </a>
+        {linkedinUrl && (
+          <a
+            className={styles.link}
+            href={linkedinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            LINKEDIN ↗
+          </a>
+        )}
         {email && (
           <a className={styles.link} href={`mailto:${email}`}>
             EMAIL ↗

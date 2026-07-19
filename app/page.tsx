@@ -2,7 +2,6 @@ import {
   classifyDomain,
   DOMAIN_LABEL,
   Domain,
-  getRecentEvents,
   getRepos,
   getUser,
 } from "@/lib/github";
@@ -13,7 +12,6 @@ import Awards from "@/components/Awards";
 import Publications from "@/components/Publications";
 import RepoGrid from "@/components/RepoGrid";
 import Initiatives from "@/components/Initiatives";
-import ActivitySignal from "@/components/ActivitySignal";
 import Footer from "@/components/Footer";
 import { TraceNode } from "@/components/CircuitTrace";
 
@@ -21,12 +19,13 @@ const FALLBACK_NAME = "Yaphet Lemiesa";
 const FALLBACK_BIO = "Student interested in hardware, AI, and robotics.";
 const FALLBACK_URL = "https://github.com/ylemiesa57";
 
+// TODO: set the real LinkedIn URL once provided -- left blank so the
+// footer link doesn't render a wrong/placeholder address in the meantime.
+const LINKEDIN_URL = "";
+const CONTACT_EMAIL = "yaphkl75@mit.edu";
+
 export default async function Home() {
-  const [user, repos, events] = await Promise.all([
-    getUser(),
-    getRepos(),
-    getRecentEvents(),
-  ]);
+  const [user, repos] = await Promise.all([getUser(), getRepos()]);
 
   const domainCounts = repos.reduce<Record<Domain, number>>(
     (acc, repo) => {
@@ -64,8 +63,11 @@ export default async function Home() {
       <Publications items={publications} />
       <RepoGrid repos={repos} />
       <Initiatives items={initiatives} />
-      <ActivitySignal events={events} />
-      <Footer githubUrl={user?.html_url ?? FALLBACK_URL} />
+      <Footer
+        githubUrl={user?.html_url ?? FALLBACK_URL}
+        email={CONTACT_EMAIL}
+        linkedinUrl={LINKEDIN_URL || undefined}
+      />
     </div>
   );
 }
