@@ -1,4 +1,5 @@
 import { DOMAIN_LABEL, GithubRepo, classifyDomain } from "@/lib/github";
+import { PINNED_REPOS } from "@/lib/content";
 import styles from "./RepoGrid.module.css";
 
 const FEATURED_COUNT = 6;
@@ -12,7 +13,7 @@ function formatPushed(iso: string): string {
   return `pushed ${date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}`;
 }
 
-function RepoCard({ repo }: { repo: GithubRepo }) {
+function RepoCard({ repo, pinned }: { repo: GithubRepo; pinned: boolean }) {
   const domain = classifyDomain(repo);
   return (
     <a
@@ -23,7 +24,7 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
     >
       <div className={styles.cardTop}>
         <span className={styles.domain}>{DOMAIN_LABEL[domain]}</span>
-        <span className={styles.stars}>★ {repo.stargazers_count}</span>
+        {pinned && <span className={styles.pin}>PINNED</span>}
       </div>
 
       <div className={styles.repoName}>{repo.name}</div>
@@ -43,8 +44,13 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
 }
 
 export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
-  const featured = repos.slice(0, FEATURED_COUNT);
-  const rest = repos.slice(FEATURED_COUNT);
+  const pinnedSet = new Set(PINNED_REPOS);
+  const pinned = repos.filter((r) => pinnedSet.has(r.name));
+  const unpinned = repos.filter((r) => !pinnedSet.has(r.name));
+
+  const featured = [...pinned, ...unpinned].slice(0, FEATURED_COUNT);
+  const featuredIds = new Set(featured.map((r) => r.id));
+  const rest = repos.filter((r) => !featuredIds.has(r.id));
 
   return (
     <section className={styles.section}>
@@ -53,13 +59,14 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
         <span className={styles.count}>{repos.length} loaded</span>
       </div>
       <p className={styles.sub}>
-        Ranked by real traction first — stars, then forks, then watchers —
-        and by what shipped most recently as a tiebreaker.
+        Ranked by real traction — stars, forks, then watchers — with
+        pushed date as a tiebreaker, and a couple pinned by hand regardless
+        of rank.
       </p>
 
       <div className={styles.grid}>
         {featured.map((repo) => (
-          <RepoCard key={repo.id} repo={repo} />
+          <RepoCard key={repo.id} repo={repo} pinned={pinnedSet.has(repo.name)} />
         ))}
       </div>
 
@@ -70,7 +77,7 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
           </summary>
           <div className={`${styles.grid} ${styles.moreGrid}`}>
             {rest.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} />
+              <RepoCard key={repo.id} repo={repo} pinned={false} />
             ))}
           </div>
         </details>

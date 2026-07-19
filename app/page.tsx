@@ -5,18 +5,19 @@ import {
   getRepos,
   getUser,
 } from "@/lib/github";
-import { awards, initiatives, publications } from "@/lib/content";
+import { awards, initiatives, ossContributions, publications } from "@/lib/content";
 import TitleBar from "@/components/TitleBar";
 import Hero from "@/components/Hero";
 import Awards from "@/components/Awards";
 import Publications from "@/components/Publications";
 import RepoGrid from "@/components/RepoGrid";
 import Initiatives from "@/components/Initiatives";
+import OSSContributions from "@/components/OSSContributions";
 import Footer from "@/components/Footer";
 import { TraceNode } from "@/components/CircuitTrace";
 
 const FALLBACK_NAME = "Yaphet Lemiesa";
-const FALLBACK_BIO = "Student interested in hardware, AI, and robotics.";
+const FALLBACK_BIO = "Student interested in software, hardware, AI, and robotics.";
 const FALLBACK_URL = "https://github.com/ylemiesa57";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/yaphet-lemiesa-606603287/";
@@ -60,6 +61,7 @@ export default async function Home() {
       <Awards items={awards} />
       <Publications items={publications} />
       <RepoGrid repos={repos} />
+      <OSSContributions items={ossContributions} />
       <Initiatives items={initiatives} />
       <Footer
         githubUrl={user?.html_url ?? FALLBACK_URL}

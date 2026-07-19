@@ -104,10 +104,14 @@
   color: var(--signal-amber);
 }
 
-.stars {
+.pin {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--signal-amber);
+  border: 1px solid var(--signal-amber-dim);
+  padding: 2px 6px;
+  border-radius: var(--radius);
 }
 
 .repoName {

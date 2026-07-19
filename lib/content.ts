@@ -86,3 +86,29 @@ export const initiatives: Initiative[] = [
     url: "https://www.instagram.com/mit.eesa/",
   },
 ];
+
+// Repos pinned into the featured Modules grid regardless of popularity
+// ranking -- for projects worth surfacing even before they've picked up
+// stars/forks (e.g. still-in-progress hardware builds).
+export const PINNED_REPOS: string[] = ["fpga-autonomous-robot-car"];
+
+export interface OSSContribution {
+  repo: string;
+  description: string;
+  url: string;
+}
+
+export const ossContributions: OSSContribution[] = [
+  {
+    repo: "bamdadd/leakgauge",
+    description:
+      "Defensive prompt-injection benchmark for measuring agent robustness. Fixed a hex-decoding edge case and clarified a CLI help string.",
+    url: "https://github.com/bamdadd/leakgauge/pulls?q=is%3Apr+author%3Aylemiesa57",
+  },
+  {
+    repo: "Naungth/EyeM",
+    description:
+      "Robotic pick-and-place visual servoing project (IBVS control, state machine, depth estimation). Contributed cube-detection integration and scene setup.",
+    url: "https://github.com/Naungth/EyeM/pulls?q=is%3Apr+author%3Aylemiesa57",
+  },
+];
