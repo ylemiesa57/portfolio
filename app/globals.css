@@ -1,0 +1,111 @@
+:root {
+  color-scheme: dark;
+
+  /* ---- Blueprint palette ---- */
+  --ink-deep: #0e2a47;      /* page background: Prussian blueprint blue */
+  --ink-panel: #133a60;     /* card / panel background */
+  --ink-panel-raised: #17456f;
+  --line-cyan: #8fb9dc;     /* hairlines, grid, secondary labels */
+  --line-cyan-dim: #4d7196; /* faint grid, dividers */
+  --paper: #f3f7fb;         /* primary text: linework white */
+  --signal-amber: #e8a33d;  /* accent: copper / solder / signal */
+  --signal-amber-dim: #a8763a;
+  --text-muted: #87a8c4;
+
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+  --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+
+  --sheet-margin: clamp(20px, 5vw, 64px);
+  --radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: var(--ink-deep);
+  color: var(--paper);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    linear-gradient(var(--line-cyan-dim) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-cyan-dim) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: -1px -1px;
+  background-attachment: fixed;
+  position: relative;
+}
+
+body::before {
+  /* Dulls the grid so it reads as a faint drafting sheet, not a UI grid demo. */
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--ink-deep);
+  opacity: 0.86;
+  pointer-events: none;
+  z-index: 0;
+}
+
+#page-root {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+::selection {
+  background: var(--signal-amber);
+  color: var(--ink-deep);
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal-amber);
+  outline-offset: 3px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--signal-amber);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

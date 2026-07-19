@@ -1,0 +1,83 @@
+.hero {
+  padding: 64px var(--sheet-margin) 48px;
+  border-bottom: 1px solid var(--line-cyan-dim);
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.eyebrowRow .rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line-cyan-dim);
+  max-width: 120px;
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(2.4rem, 7vw, 5.2rem);
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin: 0 0 18px;
+}
+
+.tagline {
+  max-width: 620px;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--paper);
+  margin-bottom: 8px;
+}
+
+.note {
+  max-width: 620px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+}
+
+.note strong {
+  color: var(--signal-amber);
+  font-weight: 500;
+}
+
+.traceWrap {
+  max-width: 720px;
+  margin-bottom: 40px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  border-top: 1px dashed var(--line-cyan-dim);
+  padding-top: 22px;
+}
+
+.stat {
+  min-width: 120px;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--paper);
+  line-height: 1;
+}
+
+.statLabel {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 6px;
+}

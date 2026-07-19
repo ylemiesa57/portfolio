@@ -1,0 +1,56 @@
+.trace {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wire {
+  fill: none;
+  stroke: var(--signal-amber-dim);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.node {
+  opacity: 0.35;
+  transition: opacity 420ms ease;
+}
+
+.nodeArmed {
+  opacity: 1;
+}
+
+.nodeRing {
+  fill: none;
+  stroke: var(--line-cyan);
+  stroke-width: 1.5;
+  transition: stroke 420ms ease;
+}
+
+.nodeArmed .nodeRing {
+  stroke: var(--signal-amber);
+}
+
+.nodeCore {
+  fill: var(--ink-panel);
+  transition: fill 420ms ease;
+}
+
+.nodeArmed .nodeCore {
+  fill: var(--signal-amber);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: var(--paper);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  fill: var(--text-muted);
+}

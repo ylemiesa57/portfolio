@@ -1,0 +1,33 @@
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px var(--sheet-margin);
+  border-bottom: 1px solid var(--line-cyan-dim);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.left {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.field {
+  white-space: nowrap;
+}
+
+.field b {
+  color: var(--line-cyan);
+  font-weight: 500;
+}
+
+.mark {
+  color: var(--signal-amber);
+  font-weight: 600;
+}
