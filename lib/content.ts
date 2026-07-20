@@ -54,7 +54,7 @@ export const awards: Award[] = [
     title: "Best Paper Nominee",
     detail: "Winter Simulation Conference (WSC) 2025",
     year: "2025",
-    url: SCHOLAR_URL,
+    url: "https://www.informs-sim.org/wsc25papers/con102.pdf",
   },
   {
     title: "Top NLP Project",
@@ -115,7 +115,7 @@ export const initiatives: Initiative[] = [
 // Repos pinned into the featured Modules grid regardless of popularity
 // ranking -- for projects worth surfacing even before they've picked up
 // stars/forks (e.g. still-in-progress hardware builds).
-export const PINNED_REPOS: string[] = ["fpga-autonomous-robot-car"];
+export const PINNED_REPOS: string[] = ["EmbraceAI", "ai-bom-analysis", "Distributed-Data-Analytics-Pipeline", "6.5931-Final-Project", "visionquest-misti"];
 
 export interface OSSContribution {
   repo: string;
