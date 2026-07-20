@@ -102,3 +102,25 @@
   color: var(--line-cyan);
   line-height: 1.45;
 }
+
+.summary {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.readMore {
+  margin-top: auto;
+  padding-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--signal-amber-dim);
+  transition: color 160ms ease;
+}
+
+.card:hover .readMore,
+.card:focus-visible .readMore {
+  color: var(--signal-amber);
+}
