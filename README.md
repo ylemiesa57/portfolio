@@ -28,13 +28,7 @@ limit.
 
 ## Deploy
 
-Push to GitHub, then [import the repo on Vercel](https://vercel.com/new) —
-it auto-detects Next.js, no config needed. Set `GITHUB_USERNAME` (and
-optionally `GITHUB_TOKEN`) as environment variables in the Vercel project
-settings if you fork this for someone other than `ylemiesa57`.
-
-## Structure
-
+Yaphet has final say on deploy plan -- ask him!
 - `lib/github.ts` — GitHub REST client + repo → domain classification
   (hardware / AI-ML / systems / data), used to group modules and drive the
   hero's circuit-trace nodes.
