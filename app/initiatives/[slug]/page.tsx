@@ -32,7 +32,7 @@ export default async function InitiativePage({
   if (!item) notFound();
 
   return (
-    <article className={styles.page}>
+    <article id="page-root" className={styles.page}>
       <div className={styles.bar}>
         <Link href="/" className={styles.back}>
           ← BACK TO PORTFOLIO
