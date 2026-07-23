@@ -136,4 +136,10 @@ export const ossContributions: OSSContribution[] = [
       "Robotic pick-and-place visual servoing project (IBVS control, state machine, depth estimation). Contributed cube-detection integration and scene setup.",
     url: "https://github.com/Naungth/EyeM/pulls?q=is%3Apr+author%3Aylemiesa57",
   },
+  {
+    repo: "apache/airflow",
+    description:
+      "Fixed a validation bug in the SSH provider where SSHRemoteJobOperator's cleanup step raised a spurious error whenever remote_base_dir was customized. Added regression tests. PR open, pending maintainer review.",
+    url: "https://github.com/apache/airflow/pull/70233",
+  },
 ];
