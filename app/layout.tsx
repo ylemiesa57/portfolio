@@ -26,8 +26,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${plexMono.variable} ${plexSans.variable}`}>
-      <body>{children}</body>
+    // suppressHydrationWarning: browser extensions (e.g. Liner) inject
+    // attributes onto <html>/<body> before React hydrates, which otherwise
+    // trips a hydration mismatch. This suppresses only attribute-level noise on
+    // these two elements, not real mismatches inside the app.
+    <html
+      lang="en"
+      className={`${plexMono.variable} ${plexSans.variable}`}
+      suppressHydrationWarning
+    >
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

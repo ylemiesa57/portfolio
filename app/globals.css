@@ -1,16 +1,28 @@
 :root {
   color-scheme: dark;
 
-  /* ---- Blueprint palette ---- */
-  --ink-deep: #0e2a47;      /* page background: Prussian blueprint blue */
-  --ink-panel: #133a60;     /* card / panel background */
-  --ink-panel-raised: #17456f;
-  --line-cyan: #8fb9dc;     /* hairlines, grid, secondary labels */
-  --line-cyan-dim: #4d7196; /* faint grid, dividers */
-  --paper: #f3f7fb;         /* primary text: linework white */
-  --signal-amber: #e8a33d;  /* accent: copper / solder / signal */
-  --signal-amber-dim: #a8763a;
-  --text-muted: #87a8c4;
+  /* ---- Oscilloscope Noir palette ----
+     A dual-trace CRT scope: a dark phosphor screen, a bright green Channel 1
+     and an amber Channel 2, over a faint graticule. Legacy variable names are
+     kept and remapped so every existing component re-skins in one place:
+     --signal-amber now drives the *primary* (green) trace; --line-cyan* are the
+     graticule; true amber lives on --amber* for Channel 2 highlights. */
+  --phosphor: #4dffa6;        /* Channel 1 — primary phosphor green */
+  --phosphor-dim: #2aa876;
+  --amber: #ffb54d;           /* Channel 2 — amber phosphor */
+  --amber-dim: #b0722a;
+
+  --ink-deep: #050a08;        /* screen: near-black, faint green cast */
+  --ink-panel: #0a1310;       /* card / panel */
+  --ink-panel-raised: #0f1b16;
+  --line-cyan: #2f6f52;       /* graticule, brighter division lines */
+  --line-cyan-dim: #163627;   /* graticule, faint sub-divisions */
+  --paper: #d9f7e8;           /* primary text: phosphor white-green */
+  --text-muted: #6cae90;
+
+  /* Legacy accent aliases → remapped to the primary green trace. */
+  --signal-amber: var(--phosphor);
+  --signal-amber-dim: var(--phosphor-dim);
 
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
@@ -36,24 +48,77 @@ body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Scope graticule: fine sub-divisions with brighter major divisions every 5. */
   background-image:
     linear-gradient(var(--line-cyan-dim) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line-cyan-dim) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(90deg, var(--line-cyan-dim) 1px, transparent 1px),
+    linear-gradient(var(--line-cyan) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-cyan) 1px, transparent 1px);
+  background-size:
+    40px 40px,
+    40px 40px,
+    200px 200px,
+    200px 200px;
   background-position: -1px -1px;
   background-attachment: fixed;
   position: relative;
 }
 
 body::before {
-  /* Dulls the grid so it reads as a faint drafting sheet, not a UI grid demo. */
+  /* Dims the graticule and sinks a soft green vignette bloom into the screen. */
   content: "";
   position: fixed;
   inset: 0;
-  background: var(--ink-deep);
-  opacity: 0.86;
+  background:
+    radial-gradient(
+      120% 90% at 50% 40%,
+      transparent 40%,
+      rgba(5, 10, 8, 0.55) 100%
+    ),
+    var(--ink-deep);
+  opacity: 0.9;
   pointer-events: none;
   z-index: 0;
+}
+
+/* ---- CRT overlay: scanlines + edge vignette + faint flicker ---- */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.16) 3px,
+      rgba(0, 0, 0, 0.16) 4px
+    ),
+    radial-gradient(
+      130% 130% at 50% 50%,
+      transparent 62%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  mix-blend-mode: multiply;
+  animation: crtFlicker 4.5s steps(60) infinite;
+}
+
+@keyframes crtFlicker {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  48% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 0.97;
+  }
+  52% {
+    opacity: 0.88;
+  }
 }
 
 #page-root {
@@ -93,11 +158,33 @@ button {
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--signal-amber);
+  color: var(--phosphor);
+  text-shadow: 0 0 8px rgba(77, 255, 166, 0.45);
+}
+
+/* Phosphor bloom utility for display type. */
+.glow {
+  text-shadow:
+    0 0 6px rgba(77, 255, 166, 0.35),
+    0 0 22px rgba(77, 255, 166, 0.18);
 }
 
 .mono {
   font-family: var(--font-mono);
+}
+
+/* Pulse a section when the navigator scrolls the visitor to it. */
+.nav-flash {
+  animation: navFlash 1.4s ease-out;
+}
+
+@keyframes navFlash {
+  0% {
+    box-shadow: inset 0 0 0 9999px rgba(77, 255, 166, 0.1);
+  }
+  100% {
+    box-shadow: inset 0 0 0 9999px rgba(77, 255, 166, 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

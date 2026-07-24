@@ -14,6 +14,11 @@ import RepoGrid from "@/components/RepoGrid";
 import Initiatives from "@/components/Initiatives";
 import OSSContributions from "@/components/OSSContributions";
 import Footer from "@/components/Footer";
+import Reveal from "@/components/Reveal";
+import ScrollRail from "@/components/ScrollRail";
+import ScrollBall from "@/components/ScrollBall";
+import ScopeTrace from "@/components/ScopeTrace";
+import Navigator from "@/components/Navigator";
 import { TraceNode } from "@/components/CircuitTrace";
 
 const FALLBACK_NAME = "Yaphet Lemiesa";
@@ -50,25 +55,43 @@ export default async function Home() {
 
   return (
     <div id="page-root">
+      <ScrollRail />
+      <ScrollBall />
       <TitleBar sheet="01/01" rev={rev} drawnBy={(user?.login ?? "ylemiesa57").toUpperCase()} />
-      <Hero
-        name={user?.name ?? FALLBACK_NAME}
-        tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
-        repoCount={user?.public_repos ?? repos.length}
-        languageCount={languageCount}
-        domains={domains}
-        photoSrc="/photo.jpg"
-      />
-      <Awards items={awards} />
-      <Publications items={publications} />
-      <RepoGrid repos={repos} />
-      <OSSContributions items={ossContributions} />
-      <Initiatives items={initiatives} />
-      <Footer
-        githubUrl={user?.html_url ?? FALLBACK_URL}
-        email={CONTACT_EMAIL}
-        linkedinUrl={LINKEDIN_URL || undefined}
-      />
+      <div id="hero" style={{ scrollMarginTop: "84px" }}>
+        <Hero
+          name={user?.name ?? FALLBACK_NAME}
+          tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
+          repoCount={user?.public_repos ?? repos.length}
+          languageCount={languageCount}
+          domains={domains}
+          photoSrc="/photo.jpg"
+        />
+      </div>
+      <ScopeTrace />
+      <Reveal id="awards">
+        <Awards items={awards} />
+      </Reveal>
+      <Reveal id="publications">
+        <Publications items={publications} />
+      </Reveal>
+      <Reveal id="modules">
+        <RepoGrid repos={repos} />
+      </Reveal>
+      <Reveal id="oss">
+        <OSSContributions items={ossContributions} />
+      </Reveal>
+      <Reveal id="initiatives">
+        <Initiatives items={initiatives} />
+      </Reveal>
+      <div id="contact" style={{ scrollMarginTop: "84px" }}>
+        <Footer
+          githubUrl={user?.html_url ?? FALLBACK_URL}
+          email={CONTACT_EMAIL}
+          linkedinUrl={LINKEDIN_URL || undefined}
+        />
+      </div>
+      <Navigator />
     </div>
   );
 }
