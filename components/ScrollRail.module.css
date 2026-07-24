@@ -1,0 +1,60 @@
+.rail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  background: var(--line-cyan-dim);
+  pointer-events: none;
+}
+
+.fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    var(--signal-amber-dim),
+    var(--signal-amber)
+  );
+}
+
+.head {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: var(--signal-amber);
+  transform: translateY(-50%);
+}
+
+.readout {
+  position: absolute;
+  top: 12px;
+  right: var(--sheet-margin);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--signal-amber);
+  box-shadow: 0 0 6px var(--signal-amber);
+}
+
+@media (max-width: 640px) {
+  .readout {
+    display: none;
+  }
+}

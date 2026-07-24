@@ -1,0 +1,26 @@
+# Neo4j 5 — knowledge graph + native vector index for GraphRAG.
+# Bring it up with:  docker compose up -d
+# Browser UI:        http://localhost:7474   (user: neo4j / pass: password)
+# Bolt (driver):     bolt://localhost:7687
+
+services:
+  neo4j:
+    image: neo4j:5
+    container_name: portfolio-graph
+    ports:
+      - "7474:7474" # HTTP / Neo4j Browser
+      - "7687:7687" # Bolt (driver protocol)
+    environment:
+      NEO4J_AUTH: neo4j/password
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*
+    volumes:
+      - neo4j-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  neo4j-data:
