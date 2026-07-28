@@ -23,7 +23,7 @@ function goToSection(id: string) {
   window.setTimeout(() => el.classList.remove("nav-flash"), 1400);
 }
 
-function truncate(s: string, n = 18) {
+function truncate(s: string, n = 24) {
   return s.length > n ? s.slice(0, n - 1) + "…" : s;
 }
 
@@ -149,7 +149,7 @@ export default function GraphCanvas({
             d2 = 1;
           }
           const d = Math.sqrt(d2);
-          const f = 26000 / d2;
+          const f = 46000 / d2;
           const ux = dx / d;
           const uy = dy / d;
           a.vx -= ux * f * 0.0016;
@@ -160,7 +160,7 @@ export default function GraphCanvas({
       }
 
       // Edge springs.
-      const REST = 148;
+      const REST = 215;
       for (const [srcId, dstId] of adjacency) {
         const a = bodiesRef.current.get(srcId);
         const b = bodiesRef.current.get(dstId);
@@ -180,13 +180,13 @@ export default function GraphCanvas({
       // Gentle pull toward centre + integrate + keep on screen.
       for (const b of bodies) {
         if (dragRef.current?.id === b.id) continue;
-        b.vx += (cx - b.x) * 0.0016;
-        b.vy += (cy - b.y) * 0.0016;
+        b.vx += (cx - b.x) * 0.0012;
+        b.vy += (cy - b.y) * 0.0012;
         b.vx *= 0.86;
         b.vy *= 0.86;
         b.x += b.vx;
         b.y += b.vy;
-        const m = 54;
+        const m = 76;
         b.x = Math.max(m, Math.min(size.w - m, b.x));
         b.y = Math.max(m, Math.min(size.h - m, b.y));
       }
@@ -242,6 +242,10 @@ export default function GraphCanvas({
 
   return (
     <div className={styles.wrap} aria-live="polite">
+      {/* Dims the page behind the graph so nodes and labels stay readable.
+          pointer-events stays none, so this darkens without blocking the
+          site underneath. */}
+      <div className={styles.backdrop} aria-hidden="true" />
       <svg
         ref={svgRef}
         className={styles.svg}
@@ -293,15 +297,15 @@ export default function GraphCanvas({
                 }}
               >
                 <circle
-                  r={seed ? 22 : 16}
+                  r={seed ? 31 : 23}
                   className={seed ? styles.haloSeed : styles.halo}
                 />
                 <circle
-                  r={seed ? 9 : 6.5}
+                  r={seed ? 13 : 9.5}
                   className={seed ? styles.dotSeed : styles.dot}
                 />
                 <text
-                  y={seed ? 26 : 22}
+                  y={seed ? 34 : 29}
                   textAnchor="middle"
                   className={isHot ? styles.labelHot : styles.label}
                 >
