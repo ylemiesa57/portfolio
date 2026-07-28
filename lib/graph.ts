@@ -65,7 +65,11 @@ export async function ensureVectorIndex(): Promise<void> {
        \`vector.dimensions\`: $dim,
        \`vector.similarity_function\`: 'cosine'
      } }`,
-    { dim: EMBED_DIM }
+    // Neo4j's vector.dimensions option requires an INTEGER. A plain JS
+    // number serializes as a float over bolt (e.g. 768.0), which this
+    // Neo4j version rejects with "Expected to be INTEGER" — wrap it with
+    // neo4j.int(), same as the k param in retrieval.ts's vector query.
+    { dim: neo4j.int(EMBED_DIM) }
   );
 }
 

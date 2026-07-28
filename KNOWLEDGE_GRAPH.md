@@ -24,8 +24,8 @@ reachable from wherever the app runs: use Neo4j Aura Free
 | OpenRouter chat | `lib/llm.ts` | — | ✅ done |
 | Gemini embeddings | `lib/embed.ts` | — | ✅ done |
 | Neo4j driver + index bootstrap | `lib/graph.ts` | — | ✅ done |
-| **ETL pipeline** | `scripts/ingest.ts` | **you** | 🔧 stub w/ TODOs |
-| **GraphRAG retrieval** | `lib/retrieval.ts` | **you** | 🔧 stub w/ TODOs |
+| **ETL pipeline** | `scripts/ingest.ts` | **you** | ✅ done |
+| **GraphRAG retrieval** | `lib/retrieval.ts` | **you** | ✅ done |
 | Answer endpoint (+ fallback) | `app/api/ask/route.ts` | me | ✅ done |
 | Subgraph viz + wiring | `components/SubgraphView.tsx`, `Navigator.tsx` | me | ✅ done |
 
