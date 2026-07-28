@@ -306,6 +306,38 @@ export default function Navigator() {
         </AnimatePresence>
       </div>
 
+      {/* Dismiss control. Lives here rather than inside GraphCanvas so it can
+          sit beside the launcher and above it in the stacking order — inside
+          the graph layer it was rendered underneath the launcher wedge and
+          was therefore unclickable. */}
+      <AnimatePresence>
+        {graph && (
+          <motion.button
+            key="trash"
+            type="button"
+            className={styles.trash}
+            onClick={() => setGraph(null)}
+            aria-label="Dismiss the retrieved subgraph and its description"
+            title="Clear graph"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.5, x: 12 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.5, x: 12 }}
+            transition={{ type: "spring", stiffness: 320, damping: 22 }}
+          >
+            <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+              <path
+                d="M4 7h16M10 4h4M9 7v12m6-12v12M6 7l1 13h10l1-13"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Persistent graph overlay — survives clicking away. */}
       {graph && (
         <GraphCanvas
@@ -314,7 +346,6 @@ export default function Navigator() {
           edges={graph.edges}
           seedIds={graph.seedIds}
           answer={graph.answer}
-          onDismiss={() => setGraph(null)}
         />
       )}
     </>

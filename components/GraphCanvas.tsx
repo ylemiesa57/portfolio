@@ -36,23 +36,22 @@ const REVEAL_MS = 110;
  * grows out of the bottom-right corner and then floats on top of the page.
  *
  * Deliberately NOT a modal: the wrapper is pointer-events:none so the site
- * underneath stays fully interactive, and only the nodes / answer card /
- * trash button opt back into pointer events. Clicking "outside" therefore
- * does nothing at all — the graph is dismissed only via the trash button
- * or by routing a new question.
+ * underneath stays fully interactive, and only the nodes and answer card opt
+ * back into pointer events. Clicking "outside" therefore does nothing at all
+ * — the graph is dismissed only via the trash button (owned by Navigator, so
+ * it can sit beside the launcher above this layer) or by routing a new
+ * question.
  */
 export default function GraphCanvas({
   nodes,
   edges,
   seedIds,
   answer,
-  onDismiss,
 }: {
   nodes: GNode[];
   edges: GEdge[];
   seedIds: string[];
   answer: string;
-  onDismiss: () => void;
 }) {
   const [size, setSize] = useState({ w: 1200, h: 800 });
   const [revealed, setRevealed] = useState(0);
@@ -327,25 +326,6 @@ export default function GraphCanvas({
         <p className={styles.cardAnswer}>{answer}</p>
         <p className={styles.cardHint}>drag nodes · click one to jump</p>
       </div>
-
-      <button
-        type="button"
-        className={styles.trash}
-        onClick={onDismiss}
-        aria-label="Dismiss the retrieved subgraph"
-        title="Dismiss graph"
-      >
-        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-          <path
-            d="M4 7h16M10 4h4M9 7v12m6-12v12M6 7l1 13h10l1-13"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.7"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
     </div>
   );
 }
