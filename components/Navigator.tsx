@@ -159,7 +159,7 @@ export default function Navigator() {
               <div className={styles.header}>
                 <span className={styles.tag}>NAV / LLM</span>
                 <span className={styles.hint}>
-                  routed on-device by llama3 · press esc to close
+                  routed via OpenRouter · press esc to close
                 </span>
               </div>
 

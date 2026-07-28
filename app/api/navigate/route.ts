@@ -1,11 +1,11 @@
 // "Ask the Blueprint" section router. Takes a visitor's plain-language question
-// and asks the local Ollama model which section of the page best answers it.
-// The routing logic lives in lib/navigate-llm.ts so /api/ask can reuse it as a
-// fallback. Everything runs on the machine serving the site.
+// and asks the model (via OpenRouter) which section of the page best answers
+// it. The routing logic lives in lib/navigate-llm.ts so /api/ask can reuse it
+// as a fallback.
 
 import { NextRequest, NextResponse } from "next/server";
 import { routeToSection } from "@/lib/navigate-llm";
-import { OllamaUnreachableError, OLLAMA_MODEL } from "@/lib/ollama";
+import { LLMUnreachableError, OPENROUTER_MODEL } from "@/lib/llm";
 
 export async function POST(req: NextRequest) {
   let query = "";
@@ -26,9 +26,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const { section, answer } = await routeToSection(query);
-    return NextResponse.json({ section, answer, model: OLLAMA_MODEL });
+    return NextResponse.json({ section, answer, model: OPENROUTER_MODEL });
   } catch (err) {
-    if (err instanceof OllamaUnreachableError) {
+    if (err instanceof LLMUnreachableError) {
       return NextResponse.json({ error: err.message }, { status: 503 });
     }
     return NextResponse.json(

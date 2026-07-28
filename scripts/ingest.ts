@@ -2,12 +2,12 @@
  * ⟢ Retrieval-layer file (your ownership area) — the ETL pipeline.
  *
  * Pulls repos (lib/github.ts) + static content (lib/content.ts), turns them
- * into graph nodes/edges, embeds each node locally (Ollama), and MERGEs
+ * into graph nodes/edges, embeds each node via the Gemini API, and MERGEs
  * everything into Neo4j. Idempotent: re-run any time (`npm run ingest`).
  *
  * Prereqs (see KNOWLEDGE_GRAPH.md):
  *   - Neo4j up:            docker compose up -d
- *   - Embed model pulled:  ollama pull nomic-embed-text
+ *   - Embed model pulled:  set GEMINI_API_KEY (see .env.example)
  */
 
 // Relative imports (not the "@/" alias): this runs under tsx, whose esbuild

@@ -1,10 +1,11 @@
-// Section routing: given a visitor's question, ask the local model which
-// section of the page best answers it. This is the pre-graph behavior and now
-// also the fallback for /api/ask when the knowledge graph hasn't been ingested
-// yet, so the navigator keeps working throughout your infra build.
+// Section routing: given a visitor's question, ask the model which section
+// of the page best answers it. This is the pre-graph behavior and now also
+// the fallback for /api/ask when the knowledge graph hasn't been ingested
+// yet (or the graph/embeddings/DB aren't reachable), so the navigator keeps
+// working regardless.
 
 import { SECTIONS, SECTION_IDS } from "./sections";
-import { ollamaChat } from "./ollama";
+import { chatComplete } from "./llm";
 
 function catalog(): string {
   return SECTIONS.map((s) => `- id "${s.id}" (${s.label}): ${s.keywords}`).join(
@@ -29,7 +30,7 @@ export interface RouteResult {
 }
 
 export async function routeToSection(query: string): Promise<RouteResult> {
-  const raw = await ollamaChat(
+  const raw = await chatComplete(
     [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: query },
