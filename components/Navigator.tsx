@@ -145,6 +145,11 @@ export default function Navigator() {
           seedIds: (data.citations ?? []).map((c: Citation) => c.id),
           answer,
         });
+        // Routing is done and the graph is taking over the screen, so retire
+        // the whole cluster (prompt input + suggestion bubbles) rather than
+        // leaving it floating over the network. Reopening it is one click.
+        setOpen(false);
+        setQuery("");
       } else {
         // No graph context — show the routed answer inline in the cluster.
         setFlat({ answer, section: data.section });
