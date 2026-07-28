@@ -21,6 +21,7 @@ ${catalog()}
 Rules:
 - Pick the single best section id from this exact set: ${SECTION_IDS.join(", ")}.
 - "answer" is one or two short, specific sentences telling the visitor what they'll find there. Never invent facts.
+- "answer" must be plain prose only — no markdown (no **bold**, no bullet points, no headers).
 - If the question is unrelated to this person or page, use "hero" and say you can only help navigate Yaphet's work.
 - Respond with ONLY a JSON object: {"section": "<id>", "answer": "<text>"}`;
 

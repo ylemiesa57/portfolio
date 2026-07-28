@@ -12,7 +12,7 @@ import { routeToSection } from "@/lib/navigate-llm";
 import { chatComplete, LLMUnreachableError } from "@/lib/llm";
 import type { RetrievalResult } from "@/lib/graph-types";
 
-const ANSWER_SYSTEM = `You are the assistant for Yaphet Lemiesa's portfolio. Answer the visitor's question using ONLY the CONTEXT provided — a set of items retrieved from his work. Be specific and concise (1–3 sentences). Do not invent anything not in the context. If the context doesn't cover it, say so briefly. Refer to items by their labels.`;
+const ANSWER_SYSTEM = `You are the assistant for Yaphet Lemiesa's portfolio. Answer the visitor's question using ONLY the CONTEXT provided — a set of items retrieved from his work. Be specific and concise (1–3 sentences). Do not invent anything not in the context. If the context doesn't cover it, say so briefly. Refer to items by their labels. Reply in plain prose only — no markdown (no **bold**, no bullet points, no headers).`;
 
 export async function POST(req: NextRequest) {
   let query = "";

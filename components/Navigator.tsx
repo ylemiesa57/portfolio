@@ -37,6 +37,18 @@ function goToSection(id: string) {
   window.setTimeout(() => el.classList.remove("nav-flash"), 1400);
 }
 
+// The system prompts tell the model to reply in plain prose, but smaller
+// free-tier models don't always comply — strip common markdown markers
+// defensively so a stray "**word**" never renders as literal asterisks.
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, "$1") // **bold**
+    .replace(/__(.+?)__/g, "$1") // __bold__
+    .replace(/\*(.+?)\*/g, "$1") // *italic*
+    .replace(/^#{1,6}\s+/gm, "") // # headers
+    .replace(/^[-*]\s+/gm, ""); // bullet points
+}
+
 export default function Navigator() {
   const reduce = useReducedMotion();
   const [open, setOpen] = useState(false);
@@ -102,7 +114,7 @@ export default function Navigator() {
         setAnswer(data?.error ?? "Something went wrong answering that.");
         return;
       }
-      setAnswer(data.answer);
+      setAnswer(stripMarkdown(data.answer));
       setTarget(data.section);
       if (data.subgraph?.nodes?.length) setSubgraph(data.subgraph);
       if (Array.isArray(data.citations)) setCitations(data.citations);
