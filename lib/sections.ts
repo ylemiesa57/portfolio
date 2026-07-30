@@ -17,7 +17,7 @@ export const SECTIONS: SectionSpec[] = [
     id: "hero",
     label: "Working drawing",
     keywords:
-      "the intro, who Yaphet is, his tagline and summary, overview stats, top of the page, start over, home",
+      "the intro, who Yaphet is, his tagline and summary, overview stats, top of the page, start over, home, education, MIT, degree, coursework, work experience, internships, Bloomberg, Jet Propulsion Laboratory, NASA, JPL, Zenyai, CAMS, MIT Sloan, technical skills, what languages or tools he knows",
   },
   {
     id: "awards",

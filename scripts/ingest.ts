@@ -15,6 +15,8 @@
 import { getRepos, classifyDomain, DOMAIN_LABEL } from "../lib/github";
 import {
   awards,
+  education,
+  experience,
   initiatives,
   ossContributions,
   publications,
@@ -86,8 +88,35 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
     type: "Person",
     label: "Yaphet Lemiesa",
     sectionId: "hero",
-    text: "Yaphet Lemiesa — student working across software, hardware, AI, and robotics.",
+    text: "Yaphet Lemiesa — MIT EECS student (B.S. May 2027 + M.Eng May 2028) working across software, hardware, AI, and robotics. Currently a Software Engineer Intern at Bloomberg L.P., building an LLM plan-and-act DevOps agent with runbook RAG on AWS EKS/Kubernetes. Skills span Python, C++, C, SQL, Bash, Java, JavaScript/TypeScript, Go, and Bluespec SystemVerilog, plus PyTorch, RAG, knowledge graphs, vector stores (FAISS), LLM agents and evaluation, Kubernetes, AWS, Docker, and FastAPI.",
   });
+
+  // Education → Education nodes.
+  for (const edu of education) {
+    const id = `education:${edu.slug}`;
+    const dates = [edu.start, edu.end].filter(Boolean).join(" — ");
+    add({
+      id,
+      type: "Education",
+      label: edu.school,
+      sectionId: "hero",
+      text: `${edu.school} — ${edu.degree}. ${dates}. Coursework: ${edu.coursework.join(", ")}.`,
+    });
+    link(PERSON_ID, "STUDIED_AT", id);
+  }
+
+  // Experience → Experience nodes (work history from the resume).
+  for (const exp of experience) {
+    const id = `experience:${exp.slug}`;
+    add({
+      id,
+      type: "Experience",
+      label: `${exp.role}, ${exp.org}`,
+      sectionId: "hero",
+      text: `${exp.role} at ${exp.org} (${exp.location}), ${exp.start} – ${exp.end}. ${exp.bullets.join(" ")}`,
+    });
+    link(PERSON_ID, "WORKED_AT", id);
+  }
 
   // Repos → Repo nodes, linked to Domain + Language.
   for (const repo of repos) {

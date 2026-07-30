@@ -22,6 +22,11 @@
   cursor: pointer;
   overflow: hidden;
   isolation: isolate;
+  /* 2x bigger, pinned to the corner: scaling from the bottom-right origin
+     grows the wedge up and to the left instead of shifting its anchor, so
+     it still reads as tucked into the corner rather than floating. */
+  transform: scale(2);
+  transform-origin: bottom right;
 }
 
 /* The warble: a soft blob that morphs continuously, faster on hover, so the
@@ -343,11 +348,15 @@
 /* ---- Dismiss-graph button, tucked in beside the launcher ---- */
 .trash {
   position: fixed;
-  /* Clears the launcher wedge, which occupies clamp(96px, 13vw, 124px) of
-     the corner. z-index sits above it so the button is actually reachable —
-     inside the graph layer (z-index 60) it was buried under the wedge. */
-  right: clamp(104px, 14vw, 134px);
-  bottom: clamp(20px, 3.4vw, 30px);
+  /* Clears the launcher wedge, which — now scaled 2x from its bottom-right
+     origin — occupies roughly clamp(192px, 26vw, 248px) of the corner
+     (double the un-scaled clamp(96px, 13vw, 124px) box). Offsets below are
+     bumped to match so the trash button still sits just past the wedge
+     instead of getting covered by it. z-index sits above the launcher so
+     the button is actually reachable — inside the graph layer (z-index 60)
+     it was buried under the wedge. */
+  right: clamp(208px, 27vw, 268px);
+  bottom: clamp(40px, 6.8vw, 60px);
   z-index: 67;
   width: 36px;
   height: 36px;
@@ -356,17 +365,20 @@
   padding: 0;
   border: 1px solid var(--line-cyan);
   border-radius: 50%;
-  background: rgba(10, 19, 16, 0.94);
+  /* Slightly more transparent than before (was 0.94) so the graph behind it
+     shows through a bit. */
+  background: rgba(10, 19, 16, 0.72);
   backdrop-filter: blur(9px);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
   color: var(--text-muted);
   cursor: pointer;
-  transition: color 160ms ease, border-color 160ms ease;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
 .trash:hover {
   color: var(--amber);
   border-color: var(--amber);
+  background: rgba(10, 19, 16, 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {

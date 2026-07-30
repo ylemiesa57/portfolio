@@ -1,7 +1,100 @@
 // Static personal content that doesn't come from an API: publications,
-// awards, and current initiatives. Sourced directly from Google Scholar,
-// the MIT UROP recipients page, and each initiative's own site — nothing
-// here is invented.
+// awards, current initiatives, work experience, and education. Sourced
+// directly from Google Scholar, the MIT UROP recipients page, each
+// initiative's own site, and Yaphet's own resume — nothing here is invented.
+
+export interface Experience {
+  slug: string;
+  role: string;
+  org: string;
+  location: string;
+  start: string;
+  end: string;
+  bullets: string[];
+}
+
+export const experience: Experience[] = [
+  {
+    slug: "bloomberg",
+    role: "Software Engineer Intern",
+    org: "Bloomberg L.P.",
+    location: "New York, NY",
+    start: "May 2026",
+    end: "Present",
+    bullets: [
+      "Architecting a production DevOps agent (Python, AWS EKS, Kubernetes) on an LLM plan-and-act loop with runbook RAG, simulating Bloomberg Media infrastructure across 12+ cluster configurations to deterministically diagnose production failures.",
+      "Designing the agent's evaluation architecture (regression suites, LLM-as-judge, golden-trace replay) to validate remediation accuracy pre-deployment, targeting a 60% MTTR reduction across 40+ services.",
+    ],
+  },
+  {
+    slug: "jpl",
+    role: "Engineering Intern",
+    org: "Jet Propulsion Laboratory (NASA)",
+    location: "Pasadena, CA",
+    start: "June 2025",
+    end: "August 2025",
+    bullets: [
+      "Accelerated mission-critical systems verification 65% via a Gemma/Llama.cpp RAG pipeline auto-generating knowledge graphs from 20+ PDF specifications.",
+      "Built an ETL pipeline (OpenCV/Docling) cutting pre-processing time for 2 TB of specifications 95% (6 hours to 18 mins) and enabling 10x larger model context.",
+      "Deployed a full-stack dashboard (React, Python, SQL) unifying data streams from Jama, GitHub, and Jira, streamlining engineering workflows 25%.",
+    ],
+  },
+  {
+    slug: "zenyai",
+    role: "Software Engineer Intern",
+    org: "Zenyai Inc. (TechStars Startup)",
+    location: "Miami, FL (Remote)",
+    start: "June 2024",
+    end: "Aug. 2024",
+    bullets: [
+      "Containerized microservices (Docker) and overhauled all RESTful API endpoints (Node.js/Flask, Firebase auth, Azure), accelerating CI/CD deploys 90% and cutting API latency 50% for 170 users.",
+    ],
+  },
+  {
+    slug: "cams",
+    role: "Quantitative Researcher",
+    org: "Cybersecurity at MIT Sloan (CAMS)",
+    location: "Cambridge, MA",
+    start: "Sept. 2024",
+    end: "Present",
+    bullets: [
+      "Architected a quantitative simulation (Python, C++) coupling Monte Carlo with a self-learning Bayesian ML loop (PyTorch) that flags zero-day anomalies from network telemetry, forecasting financial exposure at 85% accuracy and guiding $3M in loss mitigation in ICS.",
+    ],
+  },
+];
+
+export interface Education {
+  slug: string;
+  school: string;
+  degree: string;
+  location: string;
+  start: string;
+  end: string;
+  coursework: string[];
+}
+
+export const education: Education[] = [
+  {
+    slug: "mit",
+    school: "Massachusetts Institute of Technology",
+    degree: "B.S. in Electrical Engineering and Computer Science + M.Eng",
+    location: "Cambridge, MA",
+    start: "",
+    end: "B.S. May 2027, M.Eng May 2028",
+    coursework: [
+      "Algorithms",
+      "Computation Structures",
+      "Machine Learning",
+      "Hardware Accelerators for AI/ML",
+      "Introduction to Probability I & II",
+      "Robotic Manipulation",
+      "Linear Algebra",
+      "Dynamic Systems Modeling & Control",
+      "Digital Systems Lab",
+      "C & Assembly",
+    ],
+  },
+];
 
 export interface Publication {
   title: string;
