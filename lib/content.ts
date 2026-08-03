@@ -235,10 +235,4 @@ export const ossContributions: OSSContribution[] = [
       "Fixed a validation bug in the SSH provider where SSHRemoteJobOperator's cleanup step raised a spurious error whenever remote_base_dir was customized. Added regression tests. PR open, pending maintainer review.",
     url: "https://github.com/apache/airflow/pull/70233",
   },
-  {
-    repo: "pola-rs/polars",
-    description:
-      "Fixed a header-collision bug in the CSV schema inferer where a duplicate column name could get renamed to something that collided with an existing literal column name, silently dropping a field. Added regression tests. PR open, pending maintainer review.",
-    url: "https://github.com/pola-rs/polars/pull/28646",
-  },
 ];
