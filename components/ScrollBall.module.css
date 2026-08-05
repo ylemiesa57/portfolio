@@ -27,7 +27,7 @@
   border-radius: 2px;
   background: linear-gradient(
     180deg,
-    rgba(77, 255, 166, 0.15),
+    color-mix(in srgb, var(--phosphor) 25%, transparent),
     var(--phosphor)
   );
 }
@@ -40,10 +40,12 @@
   height: 22px;
   margin-left: -11px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 34%, #b8ffde, var(--phosphor) 62%);
-  box-shadow:
-    0 0 10px rgba(77, 255, 166, 0.7),
-    0 0 22px rgba(77, 255, 166, 0.35);
+  background: radial-gradient(
+    circle at 38% 34%,
+    color-mix(in srgb, var(--phosphor) 55%, white),
+    var(--phosphor) 62%
+  );
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--phosphor) 28%, transparent);
   cursor: grab;
   pointer-events: auto;
   touch-action: none;

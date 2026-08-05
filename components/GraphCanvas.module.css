@@ -16,9 +16,9 @@
   pointer-events: none;
   background: radial-gradient(
     120% 100% at 100% 100%,
-    rgba(5, 10, 8, 0.9) 0%,
-    rgba(5, 10, 8, 0.82) 45%,
-    rgba(5, 10, 8, 0.72) 100%
+    color-mix(in srgb, var(--ink-deep) 94%, var(--paper)) 0%,
+    color-mix(in srgb, var(--ink-deep) 88%, var(--paper)) 45%,
+    color-mix(in srgb, var(--ink-deep) 78%, var(--paper)) 100%
   );
   backdrop-filter: blur(2.5px);
   animation: dim 480ms ease both;
@@ -108,13 +108,13 @@
 .dot,
 .dotSeed {
   fill: var(--phosphor);
-  filter: drop-shadow(0 0 6px rgba(77, 255, 166, 0.75));
+  filter: none;
   transition: fill 160ms ease;
 }
 
 .dotSeed {
   fill: var(--amber);
-  filter: drop-shadow(0 0 9px rgba(255, 181, 77, 0.85));
+  filter: none;
 }
 
 .node:hover .dot {

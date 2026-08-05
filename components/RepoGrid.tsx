@@ -17,7 +17,10 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
   return (
     <section className={styles.section}>
       <div className={styles.heading}>
-        <h2 className={styles.title}>Modules</h2>
+        <div>
+          <p className={styles.kicker}>selected</p>
+          <h2 className={styles.title}>Modules</h2>
+        </div>
         <span className={styles.count}>{repos.length} loaded</span>
       </div>
       <p className={styles.sub}>
