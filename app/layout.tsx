@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import { Archivo_Black, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
 const plexMono = IBM_Plex_Mono({
@@ -12,6 +12,12 @@ const plexSans = IBM_Plex_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600"],
+});
+
+const archivoBlack = Archivo_Black({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +38,7 @@ export default function RootLayout({
     // these two elements, not real mismatches inside the app.
     <html
       lang="en"
-      className={`${plexMono.variable} ${plexSans.variable}`}
+      className={`${plexMono.variable} ${plexSans.variable} ${archivoBlack.variable}`}
       suppressHydrationWarning
     >
       <body suppressHydrationWarning>{children}</body>
