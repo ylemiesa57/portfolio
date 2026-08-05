@@ -2,12 +2,16 @@
   position: relative;
   scroll-margin-top: 84px;
   overflow: visible;
-  will-change: transform, filter, opacity;
+  /* Extra horizontal room so soft blur on content never kisses a clip edge. */
+  margin-inline: -12px;
+  padding-inline: 12px;
+  will-change: transform, opacity;
 }
 
 .content {
   position: relative;
   z-index: 1;
+  overflow: visible;
 }
 
 /* Foxing / mold blotches that clear as the section reveals. */

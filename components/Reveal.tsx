@@ -15,7 +15,6 @@ const ROT_INITIAL = {
   y: 48,
   rotate: -1.8,
   scale: 0.97,
-  filter: "blur(8px) sepia(0.5) contrast(1.1) saturate(0.75)",
 };
 
 const ROT_CLEAR = {
@@ -23,12 +22,11 @@ const ROT_CLEAR = {
   y: 0,
   rotate: 0,
   scale: 1,
-  filter: "blur(0px) sepia(0) contrast(1) saturate(1)",
 };
 
-// Scroll-scrubbed "organic rot" reveal: foxed + soft-focused + slightly
-// twisted at first, then clarifies into clean paper. Once a section has
-// fully cleared, we latch so it never re-rots or stays clipped.
+// Scroll-scrubbed "organic rot" reveal. Transform the section gently;
+// foxing/blur lives on a separate mold layer so text never gets clipped
+// by filter overflow.
 export default function Reveal({
   id,
   children,
@@ -46,8 +44,6 @@ export default function Reveal({
 
   const { scrollYProgress } = useScroll({
     target: ref,
-    // Finish clarifying while the section is still entering — avoids
-    // leaving tall blocks half-decayed after they fill the viewport.
     offset: ["start 95%", "start 55%"],
   });
 
@@ -55,32 +51,41 @@ export default function Reveal({
     if (v >= 0.97) setSettled(true);
   });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 1], [0, 0.8, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [56, 0]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [-2, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [0.96, 1]);
-  const filter = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    [
-      "blur(8px) sepia(0.5) contrast(1.1) saturate(0.75)",
-      "blur(2.5px) sepia(0.18) contrast(1.04) saturate(0.9)",
-      "blur(0px) sepia(0) contrast(1) saturate(1)",
-    ]
-  );
+  const opacity = useTransform(scrollYProgress, [0, 0.25, 1], [0, 0.85, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [48, 0]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [-1.6, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.975, 1]);
 
   const moldOpacity = useTransform(
     scrollYProgress,
-    [0, 0.35, 0.8, 1],
-    [0.9, 0.5, 0.1, 0]
+    [0, 0.3, 0.75, 1],
+    [0.95, 0.55, 0.12, 0]
   );
-  const moldScale = useTransform(scrollYProgress, [0, 1], [1.04, 1.16]);
-  const moldRotate = useTransform(scrollYProgress, [0, 1], [0, 6]);
-  const sporeY = useTransform(scrollYProgress, [0, 1], [0, -24]);
+  const moldScale = useTransform(scrollYProgress, [0, 1], [1.02, 1.12]);
+  const moldRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
+  const moldBlur = useTransform(
+    scrollYProgress,
+    [0, 0.55, 1],
+    [
+      "blur(1.5px) sepia(0.35) contrast(1.05)",
+      "blur(0.5px) sepia(0.12)",
+      "blur(0px) sepia(0)",
+    ]
+  );
+  const contentFilter = useTransform(
+    scrollYProgress,
+    [0, 0.55, 1],
+    [
+      "blur(3.5px) sepia(0.35) saturate(0.85)",
+      "blur(1px) sepia(0.1) saturate(0.95)",
+      "blur(0px) sepia(0) saturate(1)",
+    ]
+  );
+  const sporeY = useTransform(scrollYProgress, [0, 1], [0, -22]);
   const sporeOpacity = useTransform(
     scrollYProgress,
-    [0, 0.45, 1],
-    [0.5, 0.18, 0]
+    [0, 0.4, 1],
+    [0.45, 0.15, 0]
   );
 
   if (reduce) {
@@ -99,33 +104,26 @@ export default function Reveal({
         initial={ROT_INITIAL}
         animate={ROT_CLEAR}
         transition={{
-          duration: 1.25,
+          duration: 1.2,
           delay,
           ease: [0.22, 1, 0.36, 1],
         }}
       >
         <motion.div
           className={styles.mold}
-          initial={{ opacity: 0.75, scale: 1.03, rotate: 0 }}
-          animate={{ opacity: 0, scale: 1.14, rotate: 8 }}
-          transition={{ duration: 1.3, delay, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0.8, scale: 1.02, rotate: 0 }}
+          animate={{ opacity: 0, scale: 1.12, rotate: 6 }}
+          transition={{ duration: 1.25, delay, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden
         />
-        {Array.from({ length: 5 }).map((_, i) => (
-          <motion.span
-            key={i}
-            className={styles.spore}
-            initial={{ opacity: 0.45, y: 0 }}
-            animate={{ opacity: 0, y: -28 }}
-            transition={{
-              duration: 1.1,
-              delay: delay + 0.08 + i * 0.05,
-              ease: "easeOut",
-            }}
-            aria-hidden
-          />
-        ))}
-        <div className={styles.content}>{children}</div>
+        <motion.div
+          className={styles.content}
+          initial={{ filter: "blur(3.5px) sepia(0.35) saturate(0.85)" }}
+          animate={{ filter: "blur(0px) sepia(0) saturate(1)" }}
+          transition={{ duration: 1.15, delay, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {children}
+        </motion.div>
       </motion.div>
     );
   }
@@ -148,7 +146,6 @@ export default function Reveal({
         y,
         rotate,
         scale,
-        filter,
       }}
     >
       <motion.div
@@ -157,6 +154,7 @@ export default function Reveal({
           opacity: moldOpacity,
           scale: moldScale,
           rotate: moldRotate,
+          filter: moldBlur,
         }}
         aria-hidden
       />
@@ -168,7 +166,9 @@ export default function Reveal({
           aria-hidden
         />
       ))}
-      <div className={styles.content}>{children}</div>
+      <motion.div className={styles.content} style={{ filter: contentFilter }}>
+        {children}
+      </motion.div>
     </motion.div>
   );
 }
