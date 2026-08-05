@@ -8,7 +8,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
   flex-wrap: wrap;
 }
 
@@ -18,7 +18,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--phosphor);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .title {
@@ -26,16 +26,17 @@
   font-weight: 400;
   font-size: clamp(3.4rem, 12vw, 7.5rem);
   letter-spacing: -0.035em;
-  line-height: 0.86;
+  line-height: 0.92;
   text-transform: uppercase;
   color: var(--paper);
+  padding-bottom: 0.06em;
 }
 
 .count {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--text-muted);
-  padding-bottom: 0.55em;
+  padding-bottom: 0.7em;
 }
 
 .sub {
@@ -44,6 +45,8 @@
   max-width: 34rem;
   margin: 0 0 40px;
   line-height: 1.5;
+  position: relative;
+  z-index: 1;
 }
 
 .grid {
