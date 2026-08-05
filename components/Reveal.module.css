@@ -1,6 +1,7 @@
 .wrap {
   position: relative;
   scroll-margin-top: 84px;
+  overflow: visible;
   will-change: transform, filter, opacity;
 }
 
@@ -17,12 +18,12 @@
   pointer-events: none;
   mix-blend-mode: multiply;
   background:
-    radial-gradient(ellipse 42% 28% at 12% 18%, rgba(120, 78, 32, 0.22), transparent 70%),
-    radial-gradient(ellipse 36% 34% at 88% 22%, rgba(62, 92, 54, 0.18), transparent 68%),
-    radial-gradient(ellipse 48% 30% at 58% 78%, rgba(140, 92, 40, 0.16), transparent 72%),
-    radial-gradient(ellipse 28% 22% at 30% 60%, rgba(90, 70, 40, 0.14), transparent 70%),
-    radial-gradient(ellipse 22% 18% at 74% 48%, rgba(48, 86, 62, 0.12), transparent 68%);
-  filter: contrast(1.15) saturate(0.85);
+    radial-gradient(ellipse 42% 28% at 12% 18%, rgba(120, 78, 32, 0.14), transparent 70%),
+    radial-gradient(ellipse 36% 34% at 88% 22%, rgba(62, 92, 54, 0.12), transparent 68%),
+    radial-gradient(ellipse 48% 30% at 58% 78%, rgba(140, 92, 40, 0.1), transparent 72%),
+    radial-gradient(ellipse 28% 22% at 30% 60%, rgba(90, 70, 40, 0.09), transparent 70%),
+    radial-gradient(ellipse 22% 18% at 74% 48%, rgba(48, 86, 62, 0.08), transparent 68%);
+  filter: contrast(1.08) saturate(0.9);
   transform-origin: 40% 45%;
 }
 
