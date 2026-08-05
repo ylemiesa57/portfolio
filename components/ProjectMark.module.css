@@ -1,0 +1,245 @@
+.stage {
+  --mark: var(--phosphor);
+  --mark-soft: color-mix(in srgb, var(--phosphor) 35%, transparent);
+  --mark-ink: var(--ink-deep);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 20% 15%, var(--mark-soft), transparent 55%),
+    radial-gradient(90% 80% at 85% 90%, color-mix(in srgb, var(--amber) 18%, transparent), transparent 50%),
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--ink-panel-raised) 92%, var(--mark) 8%),
+      var(--ink-panel)
+    );
+  border: 1px solid color-mix(in srgb, var(--mark) 28%, var(--line-cyan-dim));
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+}
+
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 14px;
+  border: 1px dashed color-mix(in srgb, var(--mark) 22%, transparent);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.svg {
+  width: min(72%, 132px);
+  height: auto;
+  overflow: visible;
+  color: var(--mark);
+  filter: drop-shadow(0 8px 18px color-mix(in srgb, var(--mark) 22%, transparent));
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), filter 280ms ease;
+  z-index: 1;
+}
+
+.stageActive {
+  border-color: color-mix(in srgb, var(--mark) 55%, var(--line-cyan-dim));
+}
+
+.stageActive .svg {
+  transform: scale(1.07) translateY(-2px);
+  filter: drop-shadow(0 12px 22px color-mix(in srgb, var(--mark) 34%, transparent));
+}
+
+.stageActive .bob,
+.stageActive .float,
+.stageActive .wiggle,
+.stageActive .pulse {
+  animation-duration: 1.35s;
+}
+
+/* Idle motion pieces */
+.bob {
+  transform-origin: center;
+  animation: bob 2.8s ease-in-out infinite;
+}
+
+.spinSlow {
+  transform-origin: center;
+  animation: spin 10s linear infinite;
+}
+
+.pulse {
+  transform-origin: center;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+.wiggle {
+  transform-origin: center;
+  animation: wiggle 3.2s ease-in-out infinite;
+}
+
+.dash {
+  stroke-dasharray: 6 8;
+  animation: dash 2.4s linear infinite;
+}
+
+.blink {
+  transform-origin: center;
+  animation: blink 4.5s steps(1, end) infinite;
+}
+
+.float {
+  transform-origin: center;
+  animation: floaty 3.6s ease-in-out infinite;
+}
+
+.orbit {
+  transform-origin: center;
+  animation: orbit 5.5s linear infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(2deg);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  94%,
+  96% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Accent variants per symbol family */
+.heart {
+  --mark: #ff8fb8;
+}
+
+.graph {
+  --mark: var(--phosphor);
+}
+
+.stream {
+  --mark: #7ad7ff;
+}
+
+.chip {
+  --mark: var(--amber);
+}
+
+.eye {
+  --mark: #c4a1ff;
+}
+
+.memory {
+  --mark: #ffb4a2;
+}
+
+.coin {
+  --mark: #f0c75e;
+}
+
+.car {
+  --mark: #8dffb0;
+}
+
+.arm {
+  --mark: #9ad0ff;
+}
+
+.drone {
+  --mark: #b8f2e6;
+}
+
+.spark {
+  --mark: #ffd27a;
+}
+
+.net {
+  --mark: #9be7c4;
+}
+
+.ledger {
+  --mark: #a8c0ff;
+}
+
+.bot {
+  --mark: #d2b4ff;
+}
+
+.blueprint {
+  --mark: var(--phosphor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bob,
+  .spinSlow,
+  .pulse,
+  .wiggle,
+  .dash,
+  .blink,
+  .float,
+  .orbit {
+    animation: none;
+  }
+}

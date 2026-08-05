@@ -1,47 +1,9 @@
-import { DOMAIN_LABEL, GithubRepo, classifyDomain } from "@/lib/github";
+import { classifyDomain, GithubRepo } from "@/lib/github";
 import { PINNED_REPOS } from "@/lib/content";
+import ProjectCard from "./ProjectCard";
 import styles from "./RepoGrid.module.css";
 
 const FEATURED_COUNT = 6;
-
-function formatPushed(iso: string): string {
-  const date = new Date(iso);
-  const diffDays = Math.floor((Date.now() - date.getTime()) / 86_400_000);
-  if (diffDays < 1) return "pushed today";
-  if (diffDays === 1) return "pushed yesterday";
-  if (diffDays < 30) return `pushed ${diffDays}d ago`;
-  return `pushed ${date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}`;
-}
-
-function RepoCard({ repo, pinned }: { repo: GithubRepo; pinned: boolean }) {
-  const domain = classifyDomain(repo);
-  return (
-    <a
-      href={repo.html_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.card}
-    >
-      <div className={styles.cardTop}>
-        <span className={styles.domain}>{DOMAIN_LABEL[domain]}</span>
-        {pinned && <span className={styles.pin}>PINNED</span>}
-      </div>
-
-      <div className={styles.repoName}>{repo.name}</div>
-
-      {repo.description ? (
-        <p className={styles.desc}>{repo.description}</p>
-      ) : (
-        <p className={styles.descEmpty}>No log entry yet.</p>
-      )}
-
-      <div className={styles.cardFoot}>
-        <span>{repo.language ?? "mixed"}</span>
-        <span>{formatPushed(repo.pushed_at)}</span>
-      </div>
-    </a>
-  );
-}
 
 export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
   const pinnedSet = new Set(PINNED_REPOS);
@@ -59,14 +21,18 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
         <span className={styles.count}>{repos.length} loaded</span>
       </div>
       <p className={styles.sub}>
-        Ranked by real traction — stars, forks, then watchers — with
-        pushed date as a tiebreaker, and a couple pinned by hand regardless
-        of rank.
+        Little animated glyphs for each build — hover to tilt, click to open
+        the repo. Ranked by traction, with a few pinned by hand.
       </p>
 
       <div className={styles.grid}>
         {featured.map((repo) => (
-          <RepoCard key={repo.id} repo={repo} pinned={pinnedSet.has(repo.name)} />
+          <ProjectCard
+            key={repo.id}
+            repo={repo}
+            pinned={pinnedSet.has(repo.name)}
+            domain={classifyDomain(repo)}
+          />
         ))}
       </div>
 
@@ -77,7 +43,12 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
           </summary>
           <div className={`${styles.grid} ${styles.moreGrid}`}>
             {rest.map((repo) => (
-              <RepoCard key={repo.id} repo={repo} pinned={false} />
+              <ProjectCard
+                key={repo.id}
+                repo={repo}
+                pinned={false}
+                domain={classifyDomain(repo)}
+              />
             ))}
           </div>
         </details>
