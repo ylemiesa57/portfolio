@@ -58,7 +58,7 @@ export default async function Home() {
       <ScrollRail />
       <ScrollBall />
       <TitleBar sheet="01/01" rev={rev} drawnBy={(user?.login ?? "ylemiesa57").toUpperCase()} />
-      <div id="hero" style={{ scrollMarginTop: "84px" }}>
+      <Reveal id="hero" mode="mount" delay={0.08}>
         <Hero
           name={user?.name ?? FALLBACK_NAME}
           tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
@@ -67,8 +67,10 @@ export default async function Home() {
           domains={domains}
           photoSrc="/photo.jpg"
         />
-      </div>
-      <ScopeTrace />
+      </Reveal>
+      <Reveal id="scope">
+        <ScopeTrace />
+      </Reveal>
       <Reveal id="awards">
         <Awards items={awards} />
       </Reveal>
@@ -84,13 +86,13 @@ export default async function Home() {
       <Reveal id="initiatives">
         <Initiatives items={initiatives} />
       </Reveal>
-      <div id="contact" style={{ scrollMarginTop: "84px" }}>
+      <Reveal id="contact">
         <Footer
           githubUrl={user?.html_url ?? FALLBACK_URL}
           email={CONTACT_EMAIL}
           linkedinUrl={LINKEDIN_URL || undefined}
         />
-      </div>
+      </Reveal>
       <Navigator />
     </div>
   );
