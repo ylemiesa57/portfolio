@@ -1,31 +1,29 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* ---- Oscilloscope Noir palette ----
-     A dual-trace CRT scope: a dark phosphor screen, a bright green Channel 1
-     and an amber Channel 2, over a faint graticule. Legacy variable names are
-     kept and remapped so every existing component re-skins in one place:
-     --signal-amber now drives the *primary* (green) trace; --line-cyan* are the
-     graticule; true amber lives on --amber* for Channel 2 highlights. */
-  --phosphor: #4dffa6;        /* Channel 1 — primary phosphor green */
-  --phosphor-dim: #2aa876;
-  --amber: #ffb54d;           /* Channel 2 — amber phosphor */
-  --amber-dim: #b0722a;
+  /* ---- Light drafting table ----
+     Warm paper ground, charcoal ink, forest accent + copper secondary.
+     Legacy variable names kept so existing components re-skin in one place. */
+  --phosphor: #1f6b54;        /* primary accent — forest */
+  --phosphor-dim: #3d8f74;
+  --amber: #c47a1a;           /* secondary — copper/amber */
+  --amber-dim: #a36414;
 
-  --ink-deep: #050a08;        /* screen: near-black, faint green cast */
-  --ink-panel: #0a1310;       /* card / panel */
-  --ink-panel-raised: #0f1b16;
-  --line-cyan: #2f6f52;       /* graticule, brighter division lines */
-  --line-cyan-dim: #163627;   /* graticule, faint sub-divisions */
-  --paper: #d9f7e8;           /* primary text: phosphor white-green */
-  --text-muted: #6cae90;
+  --ink-deep: #efeae2;        /* page ground: warm paper */
+  --ink-panel: #fffcf7;       /* card / panel */
+  --ink-panel-raised: #ffffff;
+  --line-cyan: #6e675c;       /* stronger guide lines / secondary text */
+  --line-cyan-dim: #d8d0c4;   /* faint grid / borders */
+  --paper: #171512;           /* primary text: near-black charcoal */
+  --text-muted: #7a7368;
 
-  /* Legacy accent aliases → remapped to the primary green trace. */
+  /* Legacy accent aliases → primary forest accent. */
   --signal-amber: var(--phosphor);
   --signal-amber-dim: var(--phosphor-dim);
 
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
+  --font-display: "Archivo Black", Impact, "Arial Black", sans-serif;
 
   --sheet-margin: clamp(20px, 5vw, 64px);
   --radius: 2px;
@@ -48,77 +46,49 @@ body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  /* Scope graticule: fine sub-divisions with brighter major divisions every 5. */
+  /* Soft vertical column guides + light drafting grid. */
   background-image:
     linear-gradient(var(--line-cyan-dim) 1px, transparent 1px),
     linear-gradient(90deg, var(--line-cyan-dim) 1px, transparent 1px),
-    linear-gradient(var(--line-cyan) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line-cyan) 1px, transparent 1px);
+    linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(12.5% - 0.5px),
+      color-mix(in srgb, var(--line-cyan) 22%, transparent) calc(12.5% - 0.5px),
+      color-mix(in srgb, var(--line-cyan) 22%, transparent) calc(12.5% + 0.5px),
+      transparent calc(12.5% + 0.5px)
+    );
   background-size:
-    40px 40px,
-    40px 40px,
-    200px 200px,
-    200px 200px;
-  background-position: -1px -1px;
+    48px 48px,
+    48px 48px,
+    100% 100%;
+  background-position: -1px -1px, -1px -1px, 0 0;
   background-attachment: fixed;
   position: relative;
 }
 
 body::before {
-  /* Dims the graticule and sinks a soft green vignette bloom into the screen. */
   content: "";
   position: fixed;
   inset: 0;
   background:
     radial-gradient(
-      120% 90% at 50% 40%,
-      transparent 40%,
-      rgba(5, 10, 8, 0.55) 100%
+      110% 80% at 50% 0%,
+      rgba(255, 252, 247, 0.85) 0%,
+      transparent 55%
     ),
-    var(--ink-deep);
-  opacity: 0.9;
+    radial-gradient(
+      90% 70% at 80% 100%,
+      color-mix(in srgb, var(--amber) 8%, transparent),
+      transparent 50%
+    );
   pointer-events: none;
   z-index: 0;
 }
 
-/* ---- CRT overlay: scanlines + edge vignette + faint flicker ---- */
+/* No CRT overlay in light mode. */
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  pointer-events: none;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0) 0px,
-      rgba(0, 0, 0, 0) 2px,
-      rgba(0, 0, 0, 0.16) 3px,
-      rgba(0, 0, 0, 0.16) 4px
-    ),
-    radial-gradient(
-      130% 130% at 50% 50%,
-      transparent 62%,
-      rgba(0, 0, 0, 0.55) 100%
-    );
-  mix-blend-mode: multiply;
-  animation: crtFlicker 4.5s steps(60) infinite;
-}
-
-@keyframes crtFlicker {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  48% {
-    opacity: 0.86;
-  }
-  50% {
-    opacity: 0.97;
-  }
-  52% {
-    opacity: 0.88;
-  }
+  content: none;
 }
 
 #page-root {
@@ -144,7 +114,7 @@ button {
 
 ::selection {
   background: var(--signal-amber);
-  color: var(--ink-deep);
+  color: var(--ink-panel);
 }
 
 :focus-visible {
@@ -159,18 +129,23 @@ button {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--phosphor);
-  text-shadow: 0 0 8px rgba(77, 255, 166, 0.45);
 }
 
-/* Phosphor bloom utility for display type. */
 .glow {
-  text-shadow:
-    0 0 6px rgba(77, 255, 166, 0.35),
-    0 0 22px rgba(77, 255, 166, 0.18);
+  /* Kept as a no-glow utility in light mode — solid ink weight instead. */
+  text-shadow: none;
 }
 
 .mono {
   font-family: var(--font-mono);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  line-height: 0.9;
 }
 
 /* Pulse a section when the navigator scrolls the visitor to it. */
@@ -180,10 +155,10 @@ button {
 
 @keyframes navFlash {
   0% {
-    box-shadow: inset 0 0 0 9999px rgba(77, 255, 166, 0.1);
+    box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--phosphor) 10%, transparent);
   }
   100% {
-    box-shadow: inset 0 0 0 9999px rgba(77, 255, 166, 0);
+    box-shadow: inset 0 0 0 9999px transparent;
   }
 }
 

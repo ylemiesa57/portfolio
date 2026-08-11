@@ -6,8 +6,8 @@
   border-bottom: 1px solid var(--line-cyan-dim);
   background: linear-gradient(
     180deg,
-    rgba(77, 255, 166, 0.03),
-    rgba(5, 10, 8, 0)
+    color-mix(in srgb, var(--phosphor) 6%, transparent),
+    transparent
   );
   overflow: hidden;
 }
@@ -30,7 +30,7 @@
   stroke-width: 2;
   stroke-linejoin: round;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 4px rgba(77, 255, 166, 0.7));
+  filter: none;
 }
 
 .ch2 {
@@ -39,7 +39,7 @@
   stroke-width: 1.5;
   stroke-linejoin: round;
   opacity: 0.55;
-  filter: drop-shadow(0 0 3px rgba(255, 181, 77, 0.5));
+  filter: none;
 }
 
 .tag {
