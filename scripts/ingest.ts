@@ -2,12 +2,20 @@
  * ⟢ Retrieval-layer file (your ownership area) — the ETL pipeline.
  *
  * Pulls repos (lib/github.ts) + static content (lib/content.ts), turns them
- * into graph nodes/edges, embeds each node locally (Ollama), and MERGEs
- * everything into Neo4j. Idempotent: re-run any time (`npm run ingest`).
+ * into graph nodes/edges, embeds each node via the Gemini API, and writes a
+ * JSON dump for scripts/build_snapshot.py to turn into a Boltless snapshot.
+ * Idempotent: re-run any time (`npm run ingest`).
+ *
+ * This file still owns *what* the graph contains — nothing about the content
+ * pipeline changed when the storage backend moved from Neo4j to Boltless.
+ * Only the last step (upsertNode/upsertEdge → a JSON write + a Python
+ * subprocess) changed. See backend/graph_data/README.md for why the storage
+ * step is a separate, committed build artifact rather than a live write.
  *
  * Prereqs (see KNOWLEDGE_GRAPH.md):
- *   - Neo4j up:            docker compose up -d
- *   - Embed model pulled:  ollama pull nomic-embed-text
+ *   - GEMINI_API_KEY set (see .env.example)
+ *   - Python 3.12+ with boltless installed:
+ *       pip install "boltless @ git+https://github.com/ylemiesa57/boltless.git@v0.1.0"
  */
 
 // Relative imports (not the "@/" alias): this runs under tsx, whose esbuild
@@ -15,20 +23,21 @@
 import { getRepos, classifyDomain, DOMAIN_LABEL } from "../lib/github";
 import {
   awards,
+  education,
+  experience,
   initiatives,
   ossContributions,
   publications,
 } from "../lib/content";
 import { embed } from "../lib/embed";
-import {
-  ensureVectorIndex,
-  runWrite,
-  closeDriver,
-  ENTITY_LABEL,
-} from "../lib/graph";
 import type { GNode, GEdge } from "../lib/graph-types";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const PERSON_ID = "person:yaphet";
+const GRAPH_JSON_PATH = join(__dirname, "..", "graph-data", "graph.json");
+const SNAPSHOT_DIR = join(__dirname, "..", "backend", "graph_data");
 
 function slug(s: string): string {
   return s
@@ -36,27 +45,6 @@ function slug(s: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 60);
-}
-
-// ---- Neo4j write helpers (the pattern reused for every node/edge) -----------
-
-/** Upsert one node with its embedding. MERGE on id so re-runs update in place. */
-async function upsertNode(node: GNode, embedding: number[]): Promise<void> {
-  await runWrite(
-    `MERGE (n:${ENTITY_LABEL} {id: $id})
-     SET n.type = $type, n.label = $label, n.sectionId = $sectionId,
-         n.text = $text, n.url = $url, n.embedding = $embedding`,
-    { ...node, url: node.url ?? null, embedding }
-  );
-}
-
-/** Upsert one edge between two existing nodes. */
-async function upsertEdge(edge: GEdge): Promise<void> {
-  await runWrite(
-    `MATCH (a:${ENTITY_LABEL} {id: $src}), (b:${ENTITY_LABEL} {id: $dst})
-     MERGE (a)-[r:REL {rel: $rel}]->(b)`,
-    { src: edge.src, rel: edge.rel, dst: edge.dst }
-  );
 }
 
 // ---- Build the graph from content -------------------------------------------
@@ -86,8 +74,35 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
     type: "Person",
     label: "Yaphet Lemiesa",
     sectionId: "hero",
-    text: "Yaphet Lemiesa — student working across software, hardware, AI, and robotics.",
+    text: "Yaphet Lemiesa — MIT EECS student (B.S. May 2027 + M.Eng May 2028) working across software, hardware, AI, and robotics. Currently a Software Engineer Intern at Bloomberg L.P., building an LLM plan-and-act DevOps agent with runbook RAG on AWS EKS/Kubernetes. Skills span Python, C++, C, SQL, Bash, Java, JavaScript/TypeScript, Go, and Bluespec SystemVerilog, plus PyTorch, RAG, knowledge graphs, vector stores (FAISS), LLM agents and evaluation, Kubernetes, AWS, Docker, and FastAPI.",
   });
+
+  // Education → Education nodes.
+  for (const edu of education) {
+    const id = `education:${edu.slug}`;
+    const dates = [edu.start, edu.end].filter(Boolean).join(" — ");
+    add({
+      id,
+      type: "Education",
+      label: edu.school,
+      sectionId: "hero",
+      text: `${edu.school} — ${edu.degree}. ${dates}. Coursework: ${edu.coursework.join(", ")}.`,
+    });
+    link(PERSON_ID, "STUDIED_AT", id);
+  }
+
+  // Experience → Experience nodes (work history from the resume).
+  for (const exp of experience) {
+    const id = `experience:${exp.slug}`;
+    add({
+      id,
+      type: "Experience",
+      label: `${exp.role}, ${exp.org}`,
+      sectionId: "hero",
+      text: `${exp.role} at ${exp.org} (${exp.location}), ${exp.start} – ${exp.end}. ${exp.bullets.join(" ")}`,
+    });
+    link(PERSON_ID, "WORKED_AT", id);
+  }
 
   // Repos → Repo nodes, linked to Domain + Language.
   for (const repo of repos) {
@@ -192,7 +207,6 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
         label: owner,
         sectionId: "oss",
         text: `${owner} — an organization whose project Yaphet has contributed to.`,
-        url: `https://github.com/${owner}`,
       });
       link(repoId, "PART_OF", orgId);
     }
@@ -204,30 +218,45 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
 // ---- Run ---------------------------------------------------------------------
 
 async function main() {
-  console.log("→ ensuring vector index");
-  await ensureVectorIndex();
-
   console.log("→ building nodes + edges from content");
   const { nodes, edges } = await buildNodesAndEdges();
   console.log(`  ${nodes.length} nodes, ${edges.length} edges`);
 
-  console.log("→ embedding + upserting nodes");
+  console.log("→ embedding nodes (Gemini)");
+  const embeddings: Record<string, number[]> = {};
   for (const node of nodes) {
-    const vec = await embed(node.text);
-    await upsertNode(node, vec);
+    embeddings[node.id] = await embed(node.text);
     process.stdout.write(".");
   }
   console.log("");
 
-  console.log("→ upserting edges");
-  for (const edge of edges) await upsertEdge(edge);
+  mkdirSync(join(__dirname, "..", "graph-data"), { recursive: true });
+  const payload = {
+    nodes: nodes.map((n) => ({ ...n, embedding: embeddings[n.id] })),
+    edges,
+  };
+  writeFileSync(GRAPH_JSON_PATH, JSON.stringify(payload, null, 2));
+  console.log(`→ wrote ${GRAPH_JSON_PATH}`);
+
+  console.log("→ building Boltless snapshot (scripts/build_snapshot.py)");
+  const pythonBin = process.env.PYTHON_BIN || "python3";
+  const result = spawnSync(
+    pythonBin,
+    [join(__dirname, "build_snapshot.py"), GRAPH_JSON_PATH, SNAPSHOT_DIR],
+    { stdio: "inherit" }
+  );
+  if (result.status !== 0) {
+    throw new Error(
+      `build_snapshot.py failed (exit ${result.status}). Is boltless installed? ` +
+        `pip install "boltless @ git+https://github.com/ylemiesa57/boltless.git@v0.1.0"`
+    );
+  }
 
   console.log(`✓ ingest complete: ${nodes.length} nodes, ${edges.length} edges`);
+  console.log(`  Snapshot written to ${SNAPSHOT_DIR} — commit it and redeploy.`);
 }
 
-main()
-  .catch((err) => {
-    console.error("✗ ingest failed:", err);
-    process.exitCode = 1;
-  })
-  .finally(closeDriver);
+main().catch((err) => {
+  console.error("✗ ingest failed:", err);
+  process.exitCode = 1;
+});

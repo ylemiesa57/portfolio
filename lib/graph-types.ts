@@ -12,7 +12,9 @@ export type GNodeType =
   | "Org"
   | "Topic"
   | "Domain"
-  | "Language";
+  | "Language"
+  | "Experience"
+  | "Education";
 
 export interface GNode {
   /** Stable unique id, e.g. "repo:EmbraceAI", "paper:ai-small-noisy-data". */

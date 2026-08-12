@@ -1,0 +1,215 @@
+/* The graph floats over the whole page. pointer-events:none on the wrapper
+   is what keeps the site underneath interactive — only the nodes, the answer
+   card and the trash button opt back in. */
+.wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+/* Dimming layer behind the network. Non-interactive on purpose: it darkens
+   the page for legibility without swallowing clicks meant for the site. */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 100% at 100% 100%,
+    rgba(5, 10, 8, 0.9) 0%,
+    rgba(5, 10, 8, 0.82) 45%,
+    rgba(5, 10, 8, 0.72) 100%
+  );
+  backdrop-filter: blur(2.5px);
+  animation: dim 480ms ease both;
+}
+
+@keyframes dim {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+/* ---- edges ---- */
+.edge,
+.edgeLit {
+  stroke-linecap: round;
+  transition: stroke 160ms ease, stroke-opacity 160ms ease;
+}
+
+.edge {
+  stroke: var(--phosphor-dim);
+  stroke-opacity: 0.5;
+  stroke-width: 1.5;
+}
+
+.edgeLit {
+  stroke: var(--amber);
+  stroke-opacity: 0.95;
+  stroke-width: 2.4;
+}
+
+/* ---- nodes ---- */
+.node {
+  pointer-events: auto;
+  cursor: grab;
+  animation: pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.node:active {
+  cursor: grabbing;
+}
+
+.node:focus-visible {
+  outline: none;
+}
+
+.node:focus-visible .dot,
+.node:focus-visible .dotSeed {
+  stroke: var(--amber);
+  stroke-width: 2.5;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform-box: fill-box;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.halo,
+.haloSeed {
+  fill: var(--phosphor);
+  opacity: 0.08;
+  transition: opacity 180ms ease;
+}
+
+.haloSeed {
+  opacity: 0.16;
+}
+
+.node:hover .halo,
+.node:hover .haloSeed {
+  opacity: 0.3;
+}
+
+.dot,
+.dotSeed {
+  fill: var(--phosphor);
+  filter: drop-shadow(0 0 6px rgba(77, 255, 166, 0.75));
+  transition: fill 160ms ease;
+}
+
+.dotSeed {
+  fill: var(--amber);
+  filter: drop-shadow(0 0 9px rgba(255, 181, 77, 0.85));
+}
+
+.node:hover .dot {
+  fill: var(--paper);
+}
+
+.label,
+.labelHot {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  paint-order: stroke;
+  stroke: var(--ink-deep);
+  stroke-width: 4.5px;
+  stroke-linejoin: round;
+  user-select: none;
+  transition: fill 160ms ease;
+}
+
+.label {
+  fill: var(--text-muted);
+}
+
+.labelHot {
+  fill: var(--amber);
+}
+
+/* ---- answer card ---- */
+.card {
+  pointer-events: auto;
+  position: absolute;
+  right: clamp(16px, 4vw, 30px);
+  bottom: clamp(104px, 13vh, 132px);
+  width: min(390px, calc(100vw - 40px));
+  padding: 16px 18px;
+  border: 1px solid var(--line-cyan);
+  border-radius: var(--radius);
+  background: rgba(10, 19, 16, 0.93);
+  backdrop-filter: blur(9px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  animation: cardIn 420ms ease both 260ms;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cardHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+
+.cardTag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: var(--amber);
+}
+
+.cardCount {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.cardAnswer {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--paper);
+}
+
+.cardHint {
+  margin-top: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node,
+  .card,
+  .backdrop {
+    animation: none;
+  }
+}

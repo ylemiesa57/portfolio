@@ -1,10 +1,11 @@
-// Section routing: given a visitor's question, ask the local model which
-// section of the page best answers it. This is the pre-graph behavior and now
-// also the fallback for /api/ask when the knowledge graph hasn't been ingested
-// yet, so the navigator keeps working throughout your infra build.
+// Section routing: given a visitor's question, ask the model which section
+// of the page best answers it. This is the pre-graph behavior and now also
+// the fallback for /api/ask when the knowledge graph hasn't been ingested
+// yet (or the graph/embeddings/DB aren't reachable), so the navigator keeps
+// working regardless.
 
 import { SECTIONS, SECTION_IDS } from "./sections";
-import { ollamaChat } from "./ollama";
+import { chatComplete } from "./llm";
 
 function catalog(): string {
   return SECTIONS.map((s) => `- id "${s.id}" (${s.label}): ${s.keywords}`).join(
@@ -20,6 +21,7 @@ ${catalog()}
 Rules:
 - Pick the single best section id from this exact set: ${SECTION_IDS.join(", ")}.
 - "answer" is one or two short, specific sentences telling the visitor what they'll find there. Never invent facts.
+- "answer" must be plain prose only — no markdown (no **bold**, no bullet points, no headers).
 - If the question is unrelated to this person or page, use "hero" and say you can only help navigate Yaphet's work.
 - Respond with ONLY a JSON object: {"section": "<id>", "answer": "<text>"}`;
 
@@ -29,7 +31,7 @@ export interface RouteResult {
 }
 
 export async function routeToSection(query: string): Promise<RouteResult> {
-  const raw = await ollamaChat(
+  const raw = await chatComplete(
     [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: query },

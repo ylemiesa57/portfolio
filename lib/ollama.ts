@@ -7,6 +7,18 @@
 export const OLLAMA_URL = process.env.OLLAMA_URL || "http://127.0.0.1:11434";
 export const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3";
 
+// When Ollama is hosted behind an authenticating reverse proxy (required —
+// Ollama itself has no auth), set OLLAMA_TOKEN and the proxy checks it. Empty
+// for local dev where Ollama is on loopback.
+export const OLLAMA_TOKEN = process.env.OLLAMA_TOKEN || "";
+
+/** Headers for any Ollama request, adding bearer auth when a token is set. */
+export function ollamaHeaders(): HeadersInit {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (OLLAMA_TOKEN) headers.Authorization = `Bearer ${OLLAMA_TOKEN}`;
+  return headers;
+}
+
 /** Thrown when the Ollama server can't be reached at all (vs. an HTTP error). */
 export class OllamaUnreachableError extends Error {
   constructor() {
@@ -30,7 +42,7 @@ export async function ollamaChat(
   try {
     res = await fetch(`${OLLAMA_URL}/api/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: ollamaHeaders(),
       body: JSON.stringify({
         model: OLLAMA_MODEL,
         stream: false,

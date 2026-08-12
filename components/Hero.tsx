@@ -1,5 +1,5 @@
 import Image from "next/image";
-import CircuitTrace, { TraceNode } from "./CircuitTrace";
+import { TraceNode } from "./CircuitTrace";
 import styles from "./Hero.module.css";
 
 export default function Hero({
@@ -30,8 +30,8 @@ export default function Hero({
 
           <p className={styles.tagline}>{tagline}</p>
           <p className={styles.note}>
-            <strong>Note —</strong> the best of it is off this page: MIT and
-            NASA repos stay private. Ask, and I&apos;ll walk you through them.
+            <strong>Note —</strong> the best of it stays private (MIT, NASA)
+            — ask and I&apos;ll walk you through it.
           </p>
         </div>
 
@@ -52,9 +52,8 @@ export default function Hero({
         )}
       </div>
 
-      <div className={styles.traceWrap}>
-        <CircuitTrace nodes={domains} />
-      </div>
+      {/* CircuitTrace retired as primary nav (fragile scroll-linked SVG) in
+          favor of the anchor links now in TitleBar. */}
 
       <div className={styles.stats}>
         <div className={styles.stat}>

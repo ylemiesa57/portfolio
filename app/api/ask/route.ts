@@ -1,18 +1,18 @@
 // GraphRAG answer endpoint. Retrieves a connected subgraph for the question
-// (your lib/retrieval.ts), then asks the local model to answer grounded in that
+// (your lib/retrieval.ts), then asks the model to answer grounded in that
 // context and returns the answer + citations + the subgraph to render.
 //
 // Graceful degradation: if retrieval returns nothing (you haven't run ingest
-// yet, or Neo4j is down), it falls back to plain section routing so the
-// navigator keeps working throughout the infra build.
+// yet, Neo4j is unreachable, or GEMINI_API_KEY isn't set), it falls back to
+// plain section routing so the navigator keeps working.
 
 import { NextRequest, NextResponse } from "next/server";
 import { retrieve } from "@/lib/retrieval";
 import { routeToSection } from "@/lib/navigate-llm";
-import { ollamaChat, OllamaUnreachableError } from "@/lib/ollama";
+import { chatComplete, LLMUnreachableError } from "@/lib/llm";
 import type { RetrievalResult } from "@/lib/graph-types";
 
-const ANSWER_SYSTEM = `You are the assistant for Yaphet Lemiesa's portfolio. Answer the visitor's question using ONLY the CONTEXT provided — a set of items retrieved from his work. Be specific and concise (1–3 sentences). Do not invent anything not in the context. If the context doesn't cover it, say so briefly. Refer to items by their labels.`;
+const ANSWER_SYSTEM = `You are the assistant for Yaphet Lemiesa's portfolio. Answer the visitor's question using ONLY the CONTEXT provided — a set of items retrieved from his work. Be specific and concise (1–3 sentences). Do not invent anything not in the context. If the context doesn't cover it, say so briefly. Refer to items by their labels. Reply in plain prose only — no markdown (no **bold**, no bullet points, no headers).`;
 
 export async function POST(req: NextRequest) {
   let query = "";
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
         grounded: false,
       });
     } catch (err) {
-      if (err instanceof OllamaUnreachableError) {
+      if (err instanceof LLMUnreachableError) {
         return NextResponse.json({ error: err.message }, { status: 503 });
       }
       return NextResponse.json({ error: "Model request failed." }, { status: 502 });
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   let answer: string;
   try {
     answer = (
-      await ollamaChat(
+      await chatComplete(
         [
           { role: "system", content: ANSWER_SYSTEM },
           { role: "user", content: `CONTEXT:\n${context}\n\nQUESTION: ${query}` },
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       )
     ).trim();
   } catch (err) {
-    if (err instanceof OllamaUnreachableError) {
+    if (err instanceof LLMUnreachableError) {
       return NextResponse.json({ error: err.message }, { status: 503 });
     }
     return NextResponse.json({ error: "Model request failed." }, { status: 502 });

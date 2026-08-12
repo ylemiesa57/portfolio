@@ -1,26 +1,9 @@
-# Neo4j 5 — knowledge graph + native vector index for GraphRAG.
-# Bring it up with:  docker compose up -d
-# Browser UI:        http://localhost:7474   (user: neo4j / pass: password)
-# Bolt (driver):     bolt://localhost:7687
-
-services:
-  neo4j:
-    image: neo4j:5
-    container_name: portfolio-graph
-    ports:
-      - "7474:7474" # HTTP / Neo4j Browser
-      - "7687:7687" # Bolt (driver protocol)
-    environment:
-      NEO4J_AUTH: neo4j/password
-      NEO4J_PLUGINS: '["apoc"]'
-      NEO4J_dbms_security_procedures_unrestricted: apoc.*
-    volumes:
-      - neo4j-data:/data
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:7474 >/dev/null 2>&1 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-
-volumes:
-  neo4j-data:
+# DEPRECATED — no longer used.
+#
+# The graph store moved from Neo4j to Boltless (github.com/ylemiesa57/boltless),
+# a from-scratch, zero-dependency embedded graph engine served by the FastAPI
+# app in /backend. There's no container to run for local dev anymore:
+#
+#   cd backend && pip install -r requirements.txt && uvicorn main:app --reload
+#
+# See KNOWLEDGE_GRAPH.md. This file is safe to delete.
