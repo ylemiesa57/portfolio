@@ -1,6 +1,13 @@
 "use client";
 
-import { KeyboardEvent, PointerEvent, useCallback, useRef, useState } from "react";
+import {
+  KeyboardEvent,
+  PointerEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { classifyDomain, GithubRepo } from "@/lib/github";
 import ProjectCard from "./ProjectCard";
 import styles from "./RepoCarousel.module.css";
@@ -27,8 +34,11 @@ export default function RepoCarousel({
 }) {
   const count = repos.length;
   const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
   const pointerX = useRef<number | null>(null);
   const didSwipe = useRef(false);
+  const wheelAcc = useRef(0);
+  const wheelLock = useRef(false);
 
   const go = useCallback(
     (direction: number) => {
@@ -37,6 +47,35 @@ export default function RepoCarousel({
     },
     [count]
   );
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || count < 2) return;
+
+    const onWheel = (event: WheelEvent) => {
+      const horizontal =
+        Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.shiftKey
+            ? event.deltaY
+            : 0;
+      if (horizontal === 0) return;
+      event.preventDefault();
+      wheelAcc.current += horizontal;
+      if (wheelLock.current) return;
+      if (Math.abs(wheelAcc.current) < 36) return;
+      const direction = wheelAcc.current > 0 ? 1 : -1;
+      wheelAcc.current = 0;
+      wheelLock.current = true;
+      go(direction);
+      window.setTimeout(() => {
+        wheelLock.current = false;
+      }, 380);
+    };
+
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+  }, [count, go]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft") {
@@ -52,18 +91,19 @@ export default function RepoCarousel({
     if (event.pointerType === "mouse" && event.button !== 0) return;
     pointerX.current = event.clientX;
     didSwipe.current = false;
+    event.currentTarget.setPointerCapture(event.pointerId);
   }
 
-  function onPointerUp(event: PointerEvent<HTMLDivElement>) {
+  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     if (pointerX.current == null) return;
     const delta = event.clientX - pointerX.current;
-    pointerX.current = null;
-    if (Math.abs(delta) < 48) return;
+    if (Math.abs(delta) < 56) return;
     didSwipe.current = true;
+    pointerX.current = event.clientX;
     go(delta < 0 ? 1 : -1);
   }
 
-  function onPointerCancel() {
+  function onPointerUp() {
     pointerX.current = null;
   }
 
@@ -73,6 +113,7 @@ export default function RepoCarousel({
 
   return (
     <div
+      ref={rootRef}
       className={styles.carousel}
       role="region"
       aria-roledescription="carousel"
@@ -80,8 +121,14 @@ export default function RepoCarousel({
       tabIndex={0}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
-      onPointerCancel={onPointerCancel}
+      onPointerCancel={onPointerUp}
+      onClickCapture={(event) => {
+        if (!didSwipe.current) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
     >
       <div className={styles.stage}>
         <svg className={styles.arc} viewBox="0 0 1000 320" aria-hidden="true">
