@@ -1,5 +1,5 @@
 .footer {
-  padding: 30px var(--sheet-margin) 36px;
+  padding: 40px var(--sheet-margin) 48px;
   display: flex;
   flex-wrap: wrap;
   gap: 24px;

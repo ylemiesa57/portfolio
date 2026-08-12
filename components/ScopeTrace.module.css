@@ -1,7 +1,7 @@
 .scope {
   position: relative;
   width: 100%;
-  height: clamp(72px, 12vw, 112px);
+  height: clamp(96px, 16vw, 150px);
   border-top: 1px solid var(--line-cyan-dim);
   border-bottom: 1px solid var(--line-cyan-dim);
   background: linear-gradient(

@@ -8,8 +8,8 @@ import styles from "./RepoGrid.module.css";
 
 const DOMAIN_EMOJIS: Record<Domain, [string, string]> = {
   hardware: ["⚙️", "🔧"],
-  ai_ml: ["✨", "🧠"],
-  systems: ["⚡", "🌀"],
+  ai_ml: ["✨", "🤖"],
+  systems: ["⚡", "💻"],
   data: ["📊", "💫"],
 };
 

@@ -41,8 +41,8 @@ export default function Hero({
               <Image
                 src={photoSrc}
                 alt={name}
-                width={126}
-                height={126}
+                width={168}
+                height={168}
                 className={styles.photoImg}
                 priority
               />

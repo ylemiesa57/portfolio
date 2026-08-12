@@ -84,7 +84,7 @@ export default function RepoCarousel({
         onPointerCancel={onPointerCancel}
       >
         <svg className={styles.arc} viewBox="0 0 1000 320" aria-hidden="true">
-          <path d="M 70 250 Q 500 18 930 250" />
+          <path d="M 50 292 Q 500 -10 950 292" />
         </svg>
 
         {repos.map((repo, index) => {
@@ -99,12 +99,15 @@ export default function RepoCarousel({
               className={styles.slide}
               data-slot={slot}
               aria-hidden={!visible}
-              onClickCapture={(event) => {
-                if (isCenter) return;
-                event.preventDefault();
-                setActive(index);
-              }}
             >
+              {!isCenter && visible && (
+                <button
+                  type="button"
+                  className={styles.focusHit}
+                  aria-label={`Show ${repo.name}`}
+                  onClick={() => setActive(index)}
+                />
+              )}
               <ProjectCard
                 repo={repo}
                 pinned={pinned.has(repo.name)}
