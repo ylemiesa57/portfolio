@@ -28,19 +28,18 @@ function truncate(s: string, n = 24) {
 }
 
 // How long between each node popping into existence, in ms. The graph
-// "builds" out of the bottom-right corner rather than appearing at once.
+// "builds" out of the Ask dock rather than appearing at once.
 const REVEAL_MS = 110;
 
 /**
  * The retrieved subgraph, rendered as a live force-directed network that
- * grows out of the bottom-right corner and then floats on top of the page.
+ * grows out of the Ask dock and then floats over the page.
  *
- * Deliberately NOT a modal: the wrapper is pointer-events:none so the site
- * underneath stays fully interactive, and only the nodes and answer card opt
- * back into pointer events. Clicking "outside" therefore does nothing at all
- * — the graph is dismissed only via the trash button (owned by Navigator, so
- * it can sit beside the launcher above this layer) or by routing a new
- * question.
+ * Deliberately NOT a modal: no dimming sheet, pointer-events:none on the
+ * wrapper so the drafting-table site underneath stays visible and fully
+ * interactive. Only the nodes and answer card opt back into pointer events.
+ * The graph is dismissed via the trash button (owned by Navigator) or by
+ * routing a new question.
  */
 export default function GraphCanvas({
   nodes,
@@ -66,23 +65,35 @@ export default function GraphCanvas({
   const bodiesRef = useRef<Map<string, Body>>(new Map());
   const dragRef = useRef<{ id: string; moved: boolean } | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Track viewport so the layout targets real screen space.
+  // Measure the overlay box (not window.innerWidth) so html { zoom } and
+  // the Ask dock's layout still map 1:1 onto SVG user space.
   useEffect(() => {
-    const onResize = () =>
-      setSize({ w: window.innerWidth, h: window.innerHeight });
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const el = wrapRef.current;
+    if (!el) return;
+    const apply = () =>
+      setSize({
+        w: Math.max(1, el.clientWidth),
+        h: Math.max(1, el.clientHeight),
+      });
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    window.addEventListener("resize", apply);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", apply);
+    };
   }, []);
 
-  // Spawn point: the bottom-right corner, just above the launcher.
+  // Spawn point: just above the centered Ask dock.
   const origin = useMemo(
-    () => ({ x: size.w - 96, y: size.h - 96 }),
+    () => ({ x: size.w * 0.5, y: size.h - 88 }),
     [size.w, size.h]
   );
 
-  // Seed every node at the corner. They stay pinned there until revealed.
+  // Seed every node at the dock. They stay pinned there until revealed.
   useEffect(() => {
     const map = new Map<string, Body>();
     nodes.forEach((n) => {
@@ -112,9 +123,9 @@ export default function GraphCanvas({
       const b = bodiesRef.current.get(n?.id);
       if (b) {
         b.pinned = false;
-        // Kick it up and to the left, out of the corner.
-        b.vx = -2.4 - Math.random() * 2.6;
-        b.vy = -2.4 - Math.random() * 2.6;
+        // Kick it up out of the dock.
+        b.vx = (Math.random() - 0.5) * 3.2;
+        b.vy = -3.2 - Math.random() * 2.2;
       }
       setRevealed((r) => r + 1);
     }, REVEAL_MS);
@@ -214,10 +225,12 @@ export default function GraphCanvas({
     if (!drag) return;
     const b = bodiesRef.current.get(drag.id);
     if (!b) return;
-    const rect = svgRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const nx = e.clientX - rect.left;
-    const ny = e.clientY - rect.top;
+    const svg = svgRef.current;
+    const ctm = svg?.getScreenCTM();
+    if (!svg || !ctm) return;
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
+    const nx = p.x;
+    const ny = p.y;
     if (Math.hypot(nx - b.x, ny - b.y) > 3) drag.moved = true;
     b.x = nx;
     b.y = ny;
@@ -240,16 +253,14 @@ export default function GraphCanvas({
   const visibleIds = new Set(visible.map((n) => n.id));
 
   return (
-    <div className={styles.wrap} aria-live="polite">
-      {/* Dims the page behind the graph so nodes and labels stay readable.
-          pointer-events stays none, so this darkens without blocking the
-          site underneath. */}
-      <div className={styles.backdrop} aria-hidden="true" />
+    <div ref={wrapRef} className={styles.wrap} aria-live="polite">
       <svg
         ref={svgRef}
         className={styles.svg}
-        width={size.w}
-        height={size.h}
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${size.w} ${size.h}`}
+        preserveAspectRatio="none"
         onPointerMove={onPointerMove}
       >
         <g>
