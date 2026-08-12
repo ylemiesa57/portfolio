@@ -3,10 +3,11 @@
 // so retrieval works at request time wherever this is deployed, not just on
 // a machine running `ollama serve`.
 //
-// output_dimensionality is pinned to 768 to match the existing Neo4j vector
-// index (originally sized for nomic-embed-text, also 768-dim). If you ever
-// change this, update EMBED_DIM here AND drop/recreate the vector index —
-// embeddings from different models/dimensions aren't comparable.
+// output_dimensionality is pinned to 768 (originally sized for
+// nomic-embed-text, also 768-dim). If you ever change this, update EMBED_DIM
+// here and re-run `npm run ingest` — embeddings from different
+// models/dimensions aren't comparable, and Boltless rebuilds its HNSW index
+// from the new snapshot on the next graph-service cold start.
 
 import { LLMUnreachableError } from "./llm";
 

@@ -1,81 +1,89 @@
-// Neo4j driver client (server-only). Singleton driver + small read/write
-// helpers + a bootstrap for the vector index. Used by ingest.ts, retrieval.ts,
-// and /api/ask. Never import this from a client component.
+// Boltless HTTP client (server-only). The graph engine — a Boltless-backed
+// FastAPI service, see /backend — runs as a separate Vercel Service in this
+// same project (see vercel.json) and is reachable only over a private
+// service binding: Vercel injects BOLTLESS_URL at runtime, and there is no
+// public route to this service at all. Locally, run the backend yourself
+// (see backend/README.md) and BOLTLESS_URL falls back to localhost.
+//
+// This file replaces the old neo4j-driver singleton. lib/retrieval.ts is the
+// only caller; nothing else should import this directly.
 
-import neo4j, { Driver, RecordShape } from "neo4j-driver";
-import { EMBED_DIM } from "./embed";
+const BASE_URL = process.env.BOLTLESS_URL || "http://localhost:8000";
 
-const URI = process.env.NEO4J_URI || "bolt://localhost:7687";
-const USER = process.env.NEO4J_USER || "neo4j";
-const PASSWORD = process.env.NEO4J_PASSWORD || "password";
-
-// All entity nodes share the :Entity label so one vector index covers them.
-export const ENTITY_LABEL = "Entity";
-export const VECTOR_INDEX = "node_embed";
-
-let driver: Driver | null = null;
-
-export function getDriver(): Driver {
-  if (!driver) {
-    driver = neo4j.driver(URI, neo4j.auth.basic(USER, PASSWORD), {
-      // Keep the pool small; this is a single-user local app.
-      maxConnectionPoolSize: 10,
-    });
-  }
-  return driver;
+export interface BoltlessNode {
+  id: number;
+  key: string;
+  /** The Boltless graph label — set to the GNode's `type` at ingest time. */
+  label: string;
+  score: number;
+  props: Record<string, unknown>;
 }
 
-/** Run a read query and return plain record objects. */
-export async function runRead<T extends RecordShape = RecordShape>(
-  cypher: string,
-  params: Record<string, unknown> = {}
-): Promise<T[]> {
-  const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
-  try {
-    const res = await session.run<T>(cypher, params);
-    return res.records.map((r) => r.toObject());
-  } finally {
-    await session.close();
-  }
+export interface BoltlessEdge {
+  src: string;
+  dst: string;
+  type: string;
 }
 
-/** Run a write query. */
-export async function runWrite<T extends RecordShape = RecordShape>(
-  cypher: string,
-  params: Record<string, unknown> = {}
-): Promise<T[]> {
-  const session = getDriver().session({ defaultAccessMode: neo4j.session.WRITE });
-  try {
-    const res = await session.run<T>(cypher, params);
-    return res.records.map((r) => r.toObject());
-  } finally {
-    await session.close();
-  }
+export interface BoltlessRetrieveResponse {
+  nodes: BoltlessNode[];
+  edges: BoltlessEdge[];
+  seedIds: string[];
+}
+
+export interface BoltlessRetrieveOptions {
+  k?: number;
+  hops?: number;
+  topN?: number;
+  alpha?: number;
+  beta?: number;
 }
 
 /**
- * Create the vector index over :Entity(embedding) if it doesn't exist.
- * Safe to call repeatedly (IF NOT EXISTS). Call once from ingest before writing.
+ * POST /retrieve on the Boltless backend service. Throws on any non-2xx
+ * response or network failure — the caller (lib/retrieval.ts) decides how to
+ * degrade (see /api/ask/route.ts's fallback to section routing).
  */
-export async function ensureVectorIndex(): Promise<void> {
-  await runWrite(
-    `CREATE VECTOR INDEX ${VECTOR_INDEX} IF NOT EXISTS
-     FOR (n:${ENTITY_LABEL}) ON (n.embedding)
-     OPTIONS { indexConfig: {
-       \`vector.dimensions\`: $dim,
-       \`vector.similarity_function\`: 'cosine'
-     } }`,
-    // Neo4j's vector.dimensions option requires an INTEGER. A plain JS
-    // number serializes as a float over bolt (e.g. 768.0), which this
-    // Neo4j version rejects with "Expected to be INTEGER" — wrap it with
-    // neo4j.int(), same as the k param in retrieval.ts's vector query.
-    { dim: neo4j.int(EMBED_DIM) }
-  );
+export async function boltlessRetrieve(
+  embedding: number[],
+  opts: BoltlessRetrieveOptions = {}
+): Promise<BoltlessRetrieveResponse> {
+  let res: Response;
+  try {
+    res = await fetch(new URL("/retrieve", BASE_URL), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embedding,
+        k: opts.k ?? 5,
+        hops: opts.hops ?? 1,
+        top_n: opts.topN ?? 14,
+        ...(opts.alpha !== undefined ? { alpha: opts.alpha } : {}),
+        ...(opts.beta !== undefined ? { beta: opts.beta } : {}),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch (err) {
+    throw new Error(
+      `Couldn't reach the Boltless backend at ${BASE_URL}: ${err instanceof Error ? err.message : err}`
+    );
+  }
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`boltless /retrieve failed (${res.status}): ${body.slice(0, 200)}`);
+  }
+  return (await res.json()) as BoltlessRetrieveResponse;
 }
 
-export async function closeDriver(): Promise<void> {
-  if (driver) {
-    await driver.close();
-    driver = null;
-  }
+/** GET /health on the Boltless backend service. Diagnostics only. */
+export async function boltlessHealth(): Promise<{
+  ok: boolean;
+  nodes?: number;
+  edges?: number;
+  error?: string;
+}> {
+  const res = await fetch(new URL("/health", BASE_URL), {
+    signal: AbortSignal.timeout(5_000),
+  });
+  return (await res.json()) as { ok: boolean; nodes?: number; edges?: number; error?: string };
 }
