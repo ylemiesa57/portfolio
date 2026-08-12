@@ -1,42 +1,21 @@
-/* The graph floats over the whole page. pointer-events:none on the wrapper
-   is what keeps the site underneath interactive — only the nodes, the answer
-   card and the trash button opt back in. */
+/* The graph floats over the whole page. No dimming sheet — the drafting
+   table stays visible. pointer-events:none on the wrapper keeps the site
+   underneath interactive; only nodes and the answer card opt back in. */
 .wrap {
   position: fixed;
   inset: 0;
   z-index: 60;
   pointer-events: none;
-}
-
-/* Dimming layer behind the network. Non-interactive on purpose: it darkens
-   the page for legibility without swallowing clicks meant for the site. */
-.backdrop {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    120% 100% at 100% 100%,
-    color-mix(in srgb, var(--ink-deep) 94%, var(--paper)) 0%,
-    color-mix(in srgb, var(--ink-deep) 88%, var(--paper)) 45%,
-    color-mix(in srgb, var(--ink-deep) 78%, var(--paper)) 100%
-  );
-  backdrop-filter: blur(2.5px);
-  animation: dim 480ms ease both;
-}
-
-@keyframes dim {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  background: transparent;
 }
 
 .svg {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   overflow: visible;
+  background: transparent;
 }
 
 /* ---- edges ---- */
@@ -48,7 +27,7 @@
 
 .edge {
   stroke: var(--phosphor-dim);
-  stroke-opacity: 0.5;
+  stroke-opacity: 0.55;
   stroke-width: 1.5;
 }
 
@@ -92,29 +71,30 @@
 .halo,
 .haloSeed {
   fill: var(--phosphor);
-  opacity: 0.08;
+  opacity: 0.1;
   transition: opacity 180ms ease;
 }
 
 .haloSeed {
+  fill: var(--amber);
   opacity: 0.16;
 }
 
 .node:hover .halo,
 .node:hover .haloSeed {
-  opacity: 0.3;
+  opacity: 0.28;
 }
 
 .dot,
 .dotSeed {
   fill: var(--phosphor);
-  filter: none;
+  stroke: var(--ink-panel);
+  stroke-width: 1.5;
   transition: fill 160ms ease;
 }
 
 .dotSeed {
   fill: var(--amber);
-  filter: none;
 }
 
 .node:hover .dot {
@@ -128,21 +108,21 @@
   letter-spacing: 0.03em;
   paint-order: stroke;
   stroke: var(--ink-deep);
-  stroke-width: 4.5px;
+  stroke-width: 5px;
   stroke-linejoin: round;
   user-select: none;
   transition: fill 160ms ease;
 }
 
 .label {
-  fill: var(--text-muted);
+  fill: var(--paper);
 }
 
 .labelHot {
   fill: var(--amber);
 }
 
-/* ---- answer card ---- */
+/* ---- answer card: same frosted paper language as the Ask dock ---- */
 .card {
   pointer-events: auto;
   position: absolute;
@@ -150,12 +130,39 @@
   bottom: clamp(104px, 13vh, 132px);
   width: min(390px, calc(100vw - 40px));
   padding: 16px 18px;
-  border: 1px solid var(--line-cyan);
+  border: 1px solid color-mix(in srgb, var(--line-cyan-dim) 80%, var(--phosphor) 20%);
   border-radius: var(--radius);
-  background: rgba(10, 19, 16, 0.93);
-  backdrop-filter: blur(9px);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+  background: color-mix(in srgb, var(--ink-panel-raised) 86%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 8px 28px color-mix(in srgb, var(--paper) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 55%, transparent);
   animation: cardIn 420ms ease both 260ms;
+}
+
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid var(--amber-dim);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.card::before {
+  top: -1px;
+  left: -1px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.card::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: none;
+  border-top: none;
 }
 
 @keyframes cardIn {
@@ -208,8 +215,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .node,
-  .card,
-  .backdrop {
+  .card {
     animation: none;
   }
 }

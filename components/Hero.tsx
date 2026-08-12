@@ -62,10 +62,11 @@ export default function Hero({
               <Image
                 src={photoSrc}
                 alt={name}
-                width={220}
-                height={220}
+                fill
+                sizes="(max-width: 720px) 132px, 220px"
                 className={styles.photoImg}
                 priority
+                unoptimized
               />
             </div>
           </div>
