@@ -25,7 +25,7 @@
   --font-sans: "IBM Plex Sans", system-ui, sans-serif;
   --font-display: "Archivo Black", Impact, "Arial Black", sans-serif;
 
-  --sheet-margin: clamp(20px, 5vw, 64px);
+  --sheet-margin: clamp(16px, 3.75vw, 48px);
   --radius: 2px;
 }
 
@@ -43,7 +43,7 @@ body {
 
 body {
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   /* Soft vertical column guides + light drafting grid. */
@@ -59,8 +59,8 @@ body {
       transparent calc(12.5% + 0.5px)
     );
   background-size:
-    48px 48px,
-    48px 48px,
+    36px 36px,
+    36px 36px,
     100% 100%;
   background-position: -1px -1px, -1px -1px, 0 0;
   background-attachment: fixed;

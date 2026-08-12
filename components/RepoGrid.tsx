@@ -1,6 +1,7 @@
 import { classifyDomain, GithubRepo } from "@/lib/github";
 import { PINNED_REPOS } from "@/lib/content";
 import ProjectCard from "./ProjectCard";
+import RepoCarousel from "./RepoCarousel";
 import styles from "./RepoGrid.module.css";
 
 const FEATURED_COUNT = 6;
@@ -24,20 +25,12 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
         <span className={styles.count}>{repos.length} loaded</span>
       </div>
       <p className={styles.sub}>
-        Little animated glyphs for each build — hover to tilt, click to open
-        the repo. Ranked by traction, with a few pinned by hand.
+        Three builds on a slight arc — spin the carousel, hover the center
+        card to tilt, click to open the repo. Ranked by traction, with a few
+        pinned by hand.
       </p>
 
-      <div className={styles.grid}>
-        {featured.map((repo) => (
-          <ProjectCard
-            key={repo.id}
-            repo={repo}
-            pinned={pinnedSet.has(repo.name)}
-            domain={classifyDomain(repo)}
-          />
-        ))}
-      </div>
+      <RepoCarousel repos={featured} pinned={pinnedSet} />
 
       {rest.length > 0 && (
         <details className={styles.more}>

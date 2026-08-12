@@ -1,0 +1,154 @@
+"use client";
+
+import { KeyboardEvent, PointerEvent, useCallback, useRef, useState } from "react";
+import { classifyDomain, GithubRepo } from "@/lib/github";
+import ProjectCard from "./ProjectCard";
+import styles from "./RepoCarousel.module.css";
+
+function circularOffset(index: number, active: number, count: number): number {
+  let delta = ((index - active) % count + count) % count;
+  if (delta > count / 2) delta -= count;
+  return delta;
+}
+
+function slotName(offset: number): string {
+  if (offset === 0) return "0";
+  if (offset === -1) return "-1";
+  if (offset === 1) return "1";
+  return offset < 0 ? "hide-left" : "hide-right";
+}
+
+export default function RepoCarousel({
+  repos,
+  pinned,
+}: {
+  repos: GithubRepo[];
+  pinned: Set<string>;
+}) {
+  const count = repos.length;
+  const [active, setActive] = useState(0);
+  const pointerX = useRef<number | null>(null);
+
+  const go = useCallback(
+    (direction: number) => {
+      if (count < 2) return;
+      setActive((current) => (current + direction + count) % count);
+    },
+    [count]
+  );
+
+  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      go(-1);
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      go(1);
+    }
+  }
+
+  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    pointerX.current = event.clientX;
+  }
+
+  function onPointerUp(event: PointerEvent<HTMLDivElement>) {
+    if (pointerX.current == null) return;
+    const delta = event.clientX - pointerX.current;
+    pointerX.current = null;
+    if (Math.abs(delta) < 48) return;
+    go(delta < 0 ? 1 : -1);
+  }
+
+  function onPointerCancel() {
+    pointerX.current = null;
+  }
+
+  if (count === 0) return null;
+
+  const canCycle = count > 1;
+
+  return (
+    <div
+      className={styles.carousel}
+      role="region"
+      aria-roledescription="carousel"
+      aria-label="Project modules"
+      tabIndex={0}
+      onKeyDown={onKeyDown}
+    >
+      <div
+        className={styles.stage}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+      >
+        <svg className={styles.arc} viewBox="0 0 1000 320" aria-hidden="true">
+          <path d="M 70 250 Q 500 18 930 250" />
+        </svg>
+
+        {repos.map((repo, index) => {
+          const offset = circularOffset(index, active, count);
+          const slot = slotName(offset);
+          const isCenter = offset === 0;
+          const visible = Math.abs(offset) <= 1;
+
+          return (
+            <div
+              key={repo.id}
+              className={styles.slide}
+              data-slot={slot}
+              aria-hidden={!visible}
+              onClickCapture={(event) => {
+                if (isCenter) return;
+                event.preventDefault();
+                setActive(index);
+              }}
+            >
+              <ProjectCard
+                repo={repo}
+                pinned={pinned.has(repo.name)}
+                domain={classifyDomain(repo)}
+                interactive={isCenter}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {canCycle && (
+        <div className={styles.controls}>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => go(-1)}
+            aria-label="Previous projects"
+          >
+            ←
+          </button>
+          <div className={styles.dots} role="tablist" aria-label="Carousel position">
+            {repos.map((repo, index) => (
+              <button
+                key={repo.id}
+                type="button"
+                role="tab"
+                aria-selected={index === active}
+                aria-label={`Show ${repo.name}`}
+                className={`${styles.dot} ${index === active ? styles.dotOn : ""}`}
+                onClick={() => setActive(index)}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            className={styles.navBtn}
+            onClick={() => go(1)}
+            aria-label="Next projects"
+          >
+            →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
