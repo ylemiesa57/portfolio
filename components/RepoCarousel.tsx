@@ -99,16 +99,19 @@ export default function RepoCarousel({
               className={styles.slide}
               data-slot={slot}
               aria-hidden={!visible}
+              role={!isCenter && visible ? "button" : undefined}
+              tabIndex={!isCenter && visible ? 0 : undefined}
+              aria-label={!isCenter && visible ? `Show ${repo.name}` : undefined}
+              onClick={() => {
+                if (!isCenter && visible) setActive(index);
+              }}
+              onKeyDown={(event) => {
+                if (!isCenter && visible && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  setActive(index);
+                }
+              }}
             >
-              {!isCenter && visible && (
-                <button
-                  type="button"
-                  className={styles.focusHit}
-                  aria-label={`Show ${repo.name}`}
-                  onPointerDown={(event) => event.stopPropagation()}
-                  onClick={() => setActive(index)}
-                />
-              )}
               <ProjectCard
                 repo={repo}
                 pinned={pinned.has(repo.name)}
