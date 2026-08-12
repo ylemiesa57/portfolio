@@ -14,11 +14,10 @@
   --drop: clamp(56px, 8vw, 120px);
   position: relative;
   height: clamp(440px, 56vw, 540px);
-  perspective: 1500px;
-  transform-style: preserve-3d;
   overflow: visible;
   touch-action: pan-y;
   user-select: none;
+  pointer-events: none;
 }
 
 .arc {
@@ -45,19 +44,19 @@
   top: 48%;
   left: 50%;
   width: min(300px, 78vw);
-  transform: translate3d(-50%, -50%, 0);
+  transform: translate(-50%, -50%);
   transition:
     transform 620ms cubic-bezier(0.22, 1, 0.36, 1),
     opacity 380ms ease;
   will-change: transform, opacity;
+  pointer-events: auto;
 }
 
 .slide[data-slot="-1"] {
   transform:
-    translate3d(calc(-50% - var(--spread)), calc(-50% + var(--drop)), -110px)
-    rotateY(32deg)
-    rotateZ(-10deg)
-    scale(0.84);
+    translate(calc(-50% - var(--spread)), calc(-50% + var(--drop)))
+    rotate(-12deg)
+    scale(0.86);
   z-index: 2;
   opacity: 0.95;
   cursor: pointer;
@@ -69,17 +68,16 @@
 }
 
 .slide[data-slot="0"] {
-  transform: translate3d(-50%, calc(-50% - 18px), 56px) scale(1.04);
+  transform: translate(-50%, calc(-50% - 22px)) scale(1.05);
   z-index: 3;
   opacity: 1;
 }
 
 .slide[data-slot="1"] {
   transform:
-    translate3d(calc(-50% + var(--spread)), calc(-50% + var(--drop)), -110px)
-    rotateY(-32deg)
-    rotateZ(10deg)
-    scale(0.84);
+    translate(calc(-50% + var(--spread)), calc(-50% + var(--drop)))
+    rotate(12deg)
+    scale(0.86);
   z-index: 2;
   opacity: 0.95;
   cursor: pointer;
@@ -87,9 +85,8 @@
 
 .slide[data-slot="hide-left"] {
   transform:
-    translate3d(calc(-50% - var(--spread) * 1.65), calc(-50% + var(--drop) * 1.8), -160px)
-    rotateY(38deg)
-    rotateZ(-10deg)
+    translate(calc(-50% - var(--spread) * 1.65), calc(-50% + var(--drop) * 1.8))
+    rotate(-16deg)
     scale(0.68);
   z-index: 0;
   opacity: 0;
@@ -98,9 +95,8 @@
 
 .slide[data-slot="hide-right"] {
   transform:
-    translate3d(calc(-50% + var(--spread) * 1.65), calc(-50% + var(--drop) * 1.8), -160px)
-    rotateY(-38deg)
-    rotateZ(10deg)
+    translate(calc(-50% + var(--spread) * 1.65), calc(-50% + var(--drop) * 1.8))
+    rotate(16deg)
     scale(0.68);
   z-index: 0;
   opacity: 0;

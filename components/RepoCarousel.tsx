@@ -28,6 +28,7 @@ export default function RepoCarousel({
   const count = repos.length;
   const [active, setActive] = useState(0);
   const pointerX = useRef<number | null>(null);
+  const didSwipe = useRef(false);
 
   const go = useCallback(
     (direction: number) => {
@@ -50,6 +51,7 @@ export default function RepoCarousel({
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     pointerX.current = event.clientX;
+    didSwipe.current = false;
   }
 
   function onPointerUp(event: PointerEvent<HTMLDivElement>) {
@@ -57,6 +59,7 @@ export default function RepoCarousel({
     const delta = event.clientX - pointerX.current;
     pointerX.current = null;
     if (Math.abs(delta) < 48) return;
+    didSwipe.current = true;
     go(delta < 0 ? 1 : -1);
   }
 
@@ -76,13 +79,11 @@ export default function RepoCarousel({
       aria-label="Project modules"
       tabIndex={0}
       onKeyDown={onKeyDown}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerCancel}
     >
-      <div
-        className={styles.stage}
-        onPointerDown={onPointerDown}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
-      >
+      <div className={styles.stage}>
         <svg className={styles.arc} viewBox="0 0 1000 320" aria-hidden="true">
           <path d="M 50 292 Q 500 -10 950 292" />
         </svg>
@@ -103,6 +104,7 @@ export default function RepoCarousel({
               tabIndex={!isCenter && visible ? 0 : undefined}
               aria-label={!isCenter && visible ? `Show ${repo.name}` : undefined}
               onClick={() => {
+                if (didSwipe.current) return;
                 if (!isCenter && visible) setActive(index);
               }}
               onKeyDown={(event) => {
