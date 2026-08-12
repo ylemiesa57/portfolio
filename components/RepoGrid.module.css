@@ -1,5 +1,5 @@
 .section {
-  padding: 72px var(--sheet-margin) 80px;
+  padding: var(--section-pad) var(--sheet-margin);
   border-bottom: 1px solid var(--line-cyan-dim);
   overflow: visible;
 }

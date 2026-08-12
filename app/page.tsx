@@ -58,7 +58,7 @@ export default async function Home() {
       <ScrollRail />
       <ScrollBall />
       <TitleBar sheet="01/01" rev={rev} drawnBy={(user?.login ?? "ylemiesa57").toUpperCase()} />
-      <Reveal id="hero" mode="mount" delay={0.08}>
+      <Reveal id="hero">
         <Hero
           name={user?.name ?? FALLBACK_NAME}
           tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}

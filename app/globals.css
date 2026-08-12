@@ -26,6 +26,7 @@
   --font-display: "Archivo Black", Impact, "Arial Black", sans-serif;
 
   --sheet-margin: clamp(20px, 5vw, 64px);
+  --section-pad: 48px;
   --radius: 2px;
 }
 
