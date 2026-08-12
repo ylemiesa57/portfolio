@@ -80,6 +80,7 @@ export default function ProjectCard({
         target="_blank"
         rel="noopener noreferrer"
         tabIndex={interactive ? 0 : -1}
+        aria-hidden={interactive ? undefined : true}
         className={`${styles.card} ${hovered ? styles.cardHot : ""}`}
         style={
           reduce
