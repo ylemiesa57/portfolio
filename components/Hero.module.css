@@ -1,20 +1,6 @@
 .hero {
-  padding: 64px var(--sheet-margin) 48px;
+  padding: 40px var(--sheet-margin) 32px;
   border-bottom: 1px solid var(--line-cyan-dim);
-}
-
-.eyebrowRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-
-.eyebrowRow .rule {
-  flex: 1;
-  height: 1px;
-  background: var(--line-cyan-dim);
-  max-width: 120px;
 }
 
 .name {
@@ -24,7 +10,7 @@
   line-height: 0.88;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  margin: 0 0 18px;
+  margin: 0;
   color: var(--paper);
 }
 
@@ -33,83 +19,22 @@
   content: none;
 }
 
-.tagline {
-  max-width: 620px;
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.55;
-  color: var(--paper);
-  margin-bottom: 8px;
-}
-
-.note {
-  max-width: 620px;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin-bottom: 40px;
-}
-
-.note strong {
-  color: var(--signal-amber);
-  font-weight: 500;
-}
-
-.traceWrap {
-  max-width: 720px;
-  margin-bottom: 40px;
-}
-
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 32px;
-  border-top: 1px dashed var(--line-cyan-dim);
-  padding-top: 22px;
-}
-
-.stat {
-  min-width: 120px;
-}
-
-.statValue {
-  font-family: var(--font-mono);
-  font-size: 1.9rem;
-  font-weight: 600;
-  color: var(--paper);
-  line-height: 1;
-}
-
-.statLabel {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
 .top {
   display: flex;
-  gap: 40px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
+  gap: 28px;
+  align-items: center;
 }
 
 .photoFrame {
   position: relative;
   flex-shrink: 0;
-  width: 168px;
+  width: 96px;
 }
 
 .photoBox {
   position: relative;
-  width: 168px;
-  height: 168px;
+  width: 96px;
+  height: 96px;
   border: 1px solid var(--signal-amber-dim);
   border-radius: var(--radius);
   overflow: hidden;
@@ -120,8 +45,8 @@
 .photoBox::after {
   content: "";
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border: 1.5px solid var(--signal-amber);
   z-index: 2;
 }
@@ -148,23 +73,13 @@
   filter: saturate(0.9) contrast(1.03);
 }
 
-.photoCaption {
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  text-align: center;
-}
-
 @media (max-width: 720px) {
   .top {
-    flex-direction: column-reverse;
+    gap: 18px;
   }
   .photoFrame,
   .photoBox {
-    width: 120px;
-    height: 120px;
+    width: 64px;
+    height: 64px;
   }
 }

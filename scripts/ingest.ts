@@ -2,11 +2,15 @@
  * ⟢ Retrieval-layer file (your ownership area) — the ETL pipeline.
  *
  * Pulls repos (lib/github.ts) + static content (lib/content.ts), turns them
- * into graph nodes/edges, embeds each node via the Gemini API, and MERGEs
- * everything into Neo4j. Idempotent: re-run any time (`npm run ingest`).
+ * into graph nodes/edges, embeds each node via the Gemini API, and writes
+ * everything into a Boltless GraphDB snapshot via scripts/build_snapshot.py.
+ * Not incremental: every run emits the complete current graph and
+ * build_snapshot.py does a clean rebuild, so a node removed from this run's
+ * output (a deleted repo, a renamed award) doesn't linger. Re-run any time
+ * (`npm run ingest`).
  *
  * Prereqs (see KNOWLEDGE_GRAPH.md):
- *   - Neo4j up:            docker compose up -d
+ *   - `boltless` installed: pip install -r backend/requirements.txt
  *   - Embed model pulled:  set GEMINI_API_KEY (see .env.example)
  */
 
@@ -22,12 +26,9 @@ import {
   publications,
 } from "../lib/content";
 import { embed } from "../lib/embed";
-import {
-  ensureVectorIndex,
-  runWrite,
-  closeDriver,
-  ENTITY_LABEL,
-} from "../lib/graph";
+import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { GNode, GEdge } from "../lib/graph-types";
 
 const PERSON_ID = "person:yaphet";
@@ -38,27 +39,6 @@ function slug(s: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 60);
-}
-
-// ---- Neo4j write helpers (the pattern reused for every node/edge) -----------
-
-/** Upsert one node with its embedding. MERGE on id so re-runs update in place. */
-async function upsertNode(node: GNode, embedding: number[]): Promise<void> {
-  await runWrite(
-    `MERGE (n:${ENTITY_LABEL} {id: $id})
-     SET n.type = $type, n.label = $label, n.sectionId = $sectionId,
-         n.text = $text, n.url = $url, n.embedding = $embedding`,
-    { ...node, url: node.url ?? null, embedding }
-  );
-}
-
-/** Upsert one edge between two existing nodes. */
-async function upsertEdge(edge: GEdge): Promise<void> {
-  await runWrite(
-    `MATCH (a:${ENTITY_LABEL} {id: $src}), (b:${ENTITY_LABEL} {id: $dst})
-     MERGE (a)-[r:REL {rel: $rel}]->(b)`,
-    { src: edge.src, rel: edge.rel, dst: edge.dst }
-  );
 }
 
 // ---- Build the graph from content -------------------------------------------
@@ -232,31 +212,43 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
 
 // ---- Run ---------------------------------------------------------------------
 
-async function main() {
-  console.log("→ ensuring vector index");
-  await ensureVectorIndex();
+type EmbeddedNode = GNode & { embedding: number[] };
 
+async function main() {
   console.log("→ building nodes + edges from content");
   const { nodes, edges } = await buildNodesAndEdges();
   console.log(`  ${nodes.length} nodes, ${edges.length} edges`);
 
-  console.log("→ embedding + upserting nodes");
+  console.log("→ embedding nodes");
+  const embedded: EmbeddedNode[] = [];
   for (const node of nodes) {
-    const vec = await embed(node.text);
-    await upsertNode(node, vec);
+    const embedding = await embed(node.text);
+    embedded.push({ ...node, embedding });
     process.stdout.write(".");
   }
   console.log("");
 
-  console.log("→ upserting edges");
-  for (const edge of edges) await upsertEdge(edge);
+  const outDir = resolve(__dirname, "..", "graph-data");
+  mkdirSync(outDir, { recursive: true });
+  const jsonPath = resolve(outDir, "graph.json");
+  writeFileSync(jsonPath, JSON.stringify({ nodes: embedded, edges }, null, 2));
+  console.log(`→ wrote ${jsonPath}`);
+
+  console.log("→ building Boltless snapshot");
+  const snapshotDir = resolve(__dirname, "..", "backend", "graph_data");
+  const result = spawnSync(
+    "python3",
+    [resolve(__dirname, "build_snapshot.py"), jsonPath, snapshotDir],
+    { stdio: "inherit" }
+  );
+  if (result.status !== 0) {
+    throw new Error(`build_snapshot.py exited with status ${result.status}`);
+  }
 
   console.log(`✓ ingest complete: ${nodes.length} nodes, ${edges.length} edges`);
 }
 
-main()
-  .catch((err) => {
-    console.error("✗ ingest failed:", err);
-    process.exitCode = 1;
-  })
-  .finally(closeDriver);
+main().catch((err) => {
+  console.error("✗ ingest failed:", err);
+  process.exitCode = 1;
+});

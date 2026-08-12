@@ -210,6 +210,37 @@ export const initiatives: Initiative[] = [
 // stars/forks (e.g. still-in-progress hardware builds).
 export const PINNED_REPOS: string[] = ["EmbraceAI", "ai-bom-analysis", "Distributed-Data-Analytics-Pipeline", "6.5931-Final-Project", "visionquest-misti"];
 
+// Optional screenshot for a pinned/featured repo's carousel card
+// (components/RepoGrid.tsx), keyed by repo name rather than added as a field
+// on a repo object -- PINNED_REPOS is just a flat name list with no other
+// per-repo metadata today, and GithubRepo comes from the GitHub API so it
+// can't carry a local field either. A lookup keyed by name is the least
+// disruptive way to attach this.
+//
+// Convention: an entry here should point at a static asset checked into
+// `public/screenshots/<repo-name>.png` (e.g. "/screenshots/EmbraceAI.png").
+// RepoGrid falls back to a domain-tinted gradient + emoji panel for any repo
+// without an entry here, so the carousel is fully functional even before a
+// screenshot exists, and each one "just works" the moment a path is added.
+export const REPO_SCREENSHOTS: Record<string, string> = {
+  // ai-bom-analysis: a real generated output from the repo itself --
+  // ai_images/weighted_betweenness_pareto.png, one of the 8 Monte Carlo risk
+  // plots the toolkit produces (see ai_bom/ai_weighted_monte_carlo.py).
+  "ai-bom-analysis": "/screenshots/ai-bom-analysis.png",
+  // The remaining pinned repos (EmbraceAI, Distributed-Data-Analytics-Pipeline,
+  // 6.5931-Final-Project, visionquest-misti) have no live deployment and no
+  // generated visual artifacts checked in -- they're backend/pipeline/course
+  // repos with nothing to screenshot in the usual sense. Rather than fabricate
+  // a mockup, these use GitHub's own official social-preview image
+  // (https://opengraph.githubassets.com/1/ylemiesa57/<repo>), a real,
+  // GitHub-rendered card for the actual repo -- swap in a true app/demo
+  // screenshot here the moment one exists.
+  "EmbraceAI": "/screenshots/EmbraceAI.png",
+  "Distributed-Data-Analytics-Pipeline": "/screenshots/Distributed-Data-Analytics-Pipeline.png",
+  "6.5931-Final-Project": "/screenshots/6.5931-Final-Project.png",
+  "visionquest-misti": "/screenshots/visionquest-misti.png",
+};
+
 export interface OSSContribution {
   repo: string;
   description: string;
