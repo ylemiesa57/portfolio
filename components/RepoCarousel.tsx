@@ -105,6 +105,7 @@ export default function RepoCarousel({
                   type="button"
                   className={styles.focusHit}
                   aria-label={`Show ${repo.name}`}
+                  onPointerDown={(event) => event.stopPropagation()}
                   onClick={() => setActive(index)}
                 />
               )}

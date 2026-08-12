@@ -10,10 +10,10 @@
 }
 
 .stage {
-  --spread: clamp(170px, 28vw, 340px);
-  --drop: clamp(48px, 7vw, 110px);
+  --spread: clamp(220px, 32vw, 420px);
+  --drop: clamp(56px, 8vw, 120px);
   position: relative;
-  height: clamp(430px, 54vw, 520px);
+  height: clamp(440px, 56vw, 540px);
   perspective: 1500px;
   transform-style: preserve-3d;
   overflow: visible;
@@ -59,8 +59,13 @@
     rotateY(32deg)
     rotateZ(-10deg)
     scale(0.84);
-  z-index: 1;
+  z-index: 2;
   opacity: 0.95;
+}
+
+.slide[data-slot="-1"]:hover,
+.slide[data-slot="1"]:hover {
+  z-index: 4;
 }
 
 .slide[data-slot="0"] {
@@ -75,7 +80,7 @@
     rotateY(-32deg)
     rotateZ(10deg)
     scale(0.84);
-  z-index: 1;
+  z-index: 2;
   opacity: 0.95;
 }
 
@@ -161,7 +166,7 @@
 
 .focusHit {
   position: absolute;
-  inset: -8px;
+  inset: -12px;
   z-index: 6;
   border: 0;
   padding: 0;
@@ -169,15 +174,23 @@
   cursor: pointer;
 }
 
+.slide[data-slot="-1"] .focusHit {
+  right: -36px;
+}
+
+.slide[data-slot="1"] .focusHit {
+  left: -36px;
+}
+
 @media (max-width: 720px) {
   .stage {
-    --spread: clamp(118px, 36vw, 176px);
-    --drop: 52px;
-    height: 440px;
+    --spread: clamp(150px, 46vw, 250px);
+    --drop: 58px;
+    height: 450px;
   }
 
   .slide {
-    width: min(250px, 70vw);
+    width: min(210px, 58vw);
   }
 
   .slide[data-slot="-1"],
