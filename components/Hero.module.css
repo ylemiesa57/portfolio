@@ -1,115 +1,121 @@
 .hero {
-  padding: 56px var(--sheet-margin) var(--section-pad);
+  padding: 48px var(--sheet-margin) 40px;
   border-bottom: 1px solid var(--line-cyan-dim);
 }
 
-.eyebrowRow {
+.stage {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  justify-content: space-between;
+  gap: clamp(28px, 5vw, 64px);
 }
 
-.eyebrowRow .rule {
+.copy {
   flex: 1;
-  height: 1px;
-  background: var(--line-cyan-dim);
-  max-width: 120px;
+  min-width: 0;
+  max-width: 40rem;
 }
 
 .name {
   font-family: var(--font-display), Impact, "Arial Black", sans-serif;
   font-weight: 400;
-  font-size: clamp(3rem, 9vw, 6.4rem);
-  line-height: 0.88;
+  font-size: clamp(2.6rem, 7vw, 5.2rem);
+  line-height: 0.9;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   color: var(--paper);
-}
-
-.name::before,
-.name::after {
-  content: none;
 }
 
 .tagline {
-  max-width: 620px;
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  line-height: 1.55;
+  font-size: clamp(1.05rem, 1.8vw, 1.22rem);
+  line-height: 1.5;
   color: var(--paper);
-  margin-bottom: 8px;
+  margin: 0 0 18px;
+  max-width: 34rem;
+}
+
+.domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--phosphor);
+  border: 1px solid color-mix(in srgb, var(--phosphor) 28%, var(--line-cyan-dim));
+  background: color-mix(in srgb, var(--phosphor) 7%, var(--ink-panel));
+  border-radius: 999px;
+  padding: 5px 10px 5px 12px;
+}
+
+.chipCount {
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 .note {
-  max-width: 620px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
   color: var(--text-muted);
-  margin-bottom: 40px;
-}
-
-.note strong {
-  color: var(--signal-amber);
-  font-weight: 500;
-}
-
-.traceWrap {
-  max-width: 720px;
-  margin-bottom: 40px;
+  margin: 0 0 22px;
+  max-width: 32rem;
 }
 
 .stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 8px 28px;
+  margin: 0;
+  padding-top: 18px;
   border-top: 1px dashed var(--line-cyan-dim);
-  padding-top: 22px;
 }
 
 .stat {
-  min-width: 120px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 4px;
+  margin: 0;
 }
 
 .statValue {
   font-family: var(--font-mono);
-  font-size: 1.9rem;
+  font-size: 1.45rem;
   font-weight: 600;
   color: var(--paper);
   line-height: 1;
+  margin: 0;
 }
 
 .statLabel {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-top: 6px;
-}
-
-.top {
-  display: flex;
-  gap: 40px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.main {
-  flex: 1;
-  min-width: 0;
 }
 
 .photoFrame {
   position: relative;
   flex-shrink: 0;
-  width: 168px;
+  width: 220px;
 }
 
 .photoBox {
   position: relative;
-  width: 168px;
-  height: 168px;
+  width: 220px;
+  height: 220px;
   border: 1px solid var(--signal-amber-dim);
   border-radius: var(--radius);
   overflow: hidden;
@@ -148,23 +154,16 @@
   filter: saturate(0.9) contrast(1.03);
 }
 
-.photoCaption {
-  margin-top: 8px;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  text-align: center;
-}
-
 @media (max-width: 720px) {
-  .top {
+  .stage {
     flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 22px;
   }
+
   .photoFrame,
   .photoBox {
-    width: 120px;
-    height: 120px;
+    width: 132px;
+    height: 132px;
   }
 }
