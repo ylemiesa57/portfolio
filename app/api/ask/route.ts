@@ -3,8 +3,8 @@
 // context and returns the answer + citations + the subgraph to render.
 //
 // Graceful degradation: if retrieval returns nothing (you haven't run ingest
-// yet, Neo4j is unreachable, or GEMINI_API_KEY isn't set), it falls back to
-// plain section routing so the navigator keeps working.
+// yet, the Boltless graph service is unreachable, or GEMINI_API_KEY isn't
+// set), it falls back to plain section routing so the navigator keeps working.
 
 import { NextRequest, NextResponse } from "next/server";
 import { retrieve } from "@/lib/retrieval";
