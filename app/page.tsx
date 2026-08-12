@@ -17,9 +17,7 @@ import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
 import ScrollRail from "@/components/ScrollRail";
 import ScrollBall from "@/components/ScrollBall";
-import ScopeTrace from "@/components/ScopeTrace";
 import Navigator from "@/components/Navigator";
-import { TraceNode } from "@/components/CircuitTrace";
 
 const FALLBACK_NAME = "Yaphet Lemiesa";
 const FALLBACK_BIO = "Student interested in software, hardware, AI, and robotics.";
@@ -40,7 +38,7 @@ export default async function Home() {
     { hardware: 0, ai_ml: 0, systems: 0, data: 0 }
   );
 
-  const domains: TraceNode[] = (
+  const domains = (
     Object.entries(domainCounts) as [Domain, number][]
   )
     .filter(([, count]) => count > 0)
@@ -58,7 +56,7 @@ export default async function Home() {
       <ScrollRail />
       <ScrollBall />
       <TitleBar sheet="01/01" rev={rev} drawnBy={(user?.login ?? "ylemiesa57").toUpperCase()} />
-      <Reveal id="hero" mode="mount" delay={0.08}>
+      <Reveal id="hero">
         <Hero
           name={user?.name ?? FALLBACK_NAME}
           tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
@@ -67,9 +65,6 @@ export default async function Home() {
           domains={domains}
           photoSrc="/photo.jpg"
         />
-      </Reveal>
-      <Reveal id="scope">
-        <ScopeTrace />
       </Reveal>
       <Reveal id="awards">
         <Awards items={awards} />

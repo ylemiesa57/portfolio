@@ -1,6 +1,7 @@
 .section {
-  padding: 72px var(--sheet-margin) 80px;
+  padding: var(--section-pad) var(--sheet-margin);
   border-bottom: 1px solid var(--line-cyan-dim);
+  overflow: visible;
 }
 
 .heading {
@@ -52,12 +53,49 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 22px;
+  gap: 28px 22px;
   perspective: 1200px;
+}
+
+.cardShell {
+  position: relative;
+  height: 100%;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.spinEmoji {
+  position: absolute;
+  z-index: 0;
+  font-size: 2.35rem;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--paper) 18%, transparent));
+}
+
+.spinTR {
+  top: -0.72em;
+  right: -0.68em;
+  animation: spinEmoji 9s linear infinite;
+}
+
+.spinBL {
+  bottom: -0.72em;
+  left: -0.68em;
+  animation: spinEmoji 12s linear infinite reverse;
+}
+
+@keyframes spinEmoji {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .card {
   position: relative;
+  z-index: 1;
+  height: 100%;
   padding: 14px 14px 16px;
   background: var(--ink-panel);
   border: 1.5px solid var(--line-cyan-dim);
@@ -202,6 +240,7 @@
   margin-top: 28px;
   border-top: 1px dashed var(--line-cyan-dim);
   padding-top: 20px;
+  overflow: visible;
 }
 
 .moreSummary {
@@ -237,6 +276,7 @@
 
 .moreGrid {
   margin-top: 20px;
+  overflow: visible;
 }
 
 @media (max-width: 560px) {

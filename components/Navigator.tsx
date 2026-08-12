@@ -53,14 +53,10 @@ function stripMarkdown(text: string): string {
 }
 
 /**
- * Corner navigator. Deliberately non-modal: the bubble cluster lives in the
- * bottom-right corner with no scrim, so the rest of the page stays scrollable
- * and clickable the whole time. Clicking anywhere outside the cluster just
- * closes the cluster and hands focus back to the page.
- *
- * The retrieved graph (GraphCanvas) is separate and *persists* — clicking
- * away doesn't dismiss it. It goes away only via its trash button, or when a
- * new question is routed.
+ * Bottom-dock navigator. A small iOS-style pill sits at the center of the
+ * screen; opening it expands into a search bar with suggestion chips above.
+ * No scrim — the rest of the page stays scrollable. The retrieved graph
+ * (GraphCanvas) persists until dismissed via the trash button.
  */
 export default function Navigator() {
   const reduce = useReducedMotion();
@@ -166,95 +162,40 @@ export default function Navigator() {
 
   return (
     <>
-      {/* Corner launcher — a quarter-circle that warbles on hover. */}
-      <button
-        type="button"
-        className={styles.launcher}
-        onClick={() => (open ? setOpen(false) : openNav())}
-        aria-label="Ask the blueprint — natural-language navigation"
-        aria-expanded={open}
-      >
-        <span className={styles.warble} aria-hidden="true" />
-        <span className={styles.wave} aria-hidden="true" />
-        <span className={styles.launcherInner}>
-          <span className={styles.launcherDot} aria-hidden="true" />
-          <span className={styles.launcherText}>Ask</span>
-        </span>
-      </button>
-
-      {/* Floating cluster. pointer-events:none on the wrapper keeps the page
-          underneath live; each bubble opts back in. */}
-      <div className={styles.cluster} ref={clusterRef}>
+      <div className={styles.dock} ref={clusterRef}>
         <AnimatePresence>
-          {open && (
-            <motion.form
-              key="prompt"
-              className={styles.promptBubble}
-              onSubmit={(e) => {
-                e.preventDefault();
-                ask(query);
-              }}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.7, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.75, y: 16 }}
-              transition={{ type: "spring", stiffness: 320, damping: 24 }}
+          {showBubbles && (
+            <motion.div
+              key="chips"
+              className={styles.chips}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              transition={{ duration: 0.22 }}
             >
-              <span className={styles.promptLabel}>route?</span>
-              <input
-                ref={inputRef}
-                className={styles.input}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="ask about the work…"
-                autoComplete="off"
-                spellCheck={false}
-                disabled={status === "thinking"}
-              />
-              <button
-                type="submit"
-                className={styles.go}
-                disabled={status === "thinking" || !query.trim()}
-              >
-                route →
-              </button>
-            </motion.form>
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={styles.bubble}
+                  onClick={() => {
+                    setQuery(s);
+                    ask(s);
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </motion.div>
           )}
-
-          {/* Suggestion bubbles orbit the prompt, and vanish while thinking. */}
-          {showBubbles &&
-            SUGGESTIONS.map((s, i) => (
-              <motion.button
-                key={s}
-                type="button"
-                className={`${styles.bubble} ${styles[`bubble${i}`]}`}
-                onClick={() => {
-                  setQuery(s);
-                  ask(s);
-                }}
-                initial={
-                  reduce ? { opacity: 0 } : { opacity: 0, scale: 0.4, y: 20 }
-                }
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.5 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 20,
-                  delay: 0.06 + i * 0.055,
-                }}
-              >
-                {s}
-              </motion.button>
-            ))}
 
           {open && status === "thinking" && (
             <motion.div
               key="thinking"
               className={styles.thinkingBubble}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.7 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.7 }}
-              transition={{ type: "spring", stiffness: 320, damping: 22 }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
             >
               <span className={styles.spinner} aria-hidden="true" />
               <span>thinking…</span>
@@ -265,23 +206,21 @@ export default function Navigator() {
             <motion.div
               key="error"
               className={styles.errorBubble}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
               {error}
             </motion.div>
           )}
 
-          {/* Fallback (no graph retrieved): answer shown right in the cluster. */}
           {open && flat && status === "idle" && (
             <motion.div
               key="flat"
               className={styles.flatBubble}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.8, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 24 }}
             >
               <p className={styles.flatText}>{flat.answer}</p>
               <div className={styles.flatRow}>
@@ -309,6 +248,51 @@ export default function Navigator() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {open ? (
+          <form
+            className={styles.promptBar}
+            onSubmit={(e) => {
+              e.preventDefault();
+              ask(query);
+            }}
+          >
+            <span className={styles.promptLabel}>Ask</span>
+            <input
+              ref={inputRef}
+              className={styles.input}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="ask about the work…"
+              autoComplete="off"
+              spellCheck={false}
+              disabled={status === "thinking"}
+            />
+            <button
+              type="submit"
+              className={styles.go}
+              disabled={status === "thinking" || !query.trim()}
+            >
+              go
+            </button>
+          </form>
+        ) : (
+          <button
+            type="button"
+            className={styles.launcher}
+            onClick={openNav}
+            aria-label="Ask the blueprint — natural-language navigation"
+            aria-expanded={false}
+          >
+            <span className={styles.warble} aria-hidden="true" />
+            <span className={styles.launcherInner}>
+              <span className={styles.launcherDot} aria-hidden="true" />
+              <span className={styles.launcherText}>Ask</span>
+            </span>
+          </button>
+        )}
+
+        <span className={styles.homeTick} aria-hidden="true" />
       </div>
 
       {/* Dismiss control. Lives here rather than inside GraphCanvas so it can

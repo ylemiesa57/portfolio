@@ -1,49 +1,72 @@
-/* ---- Corner launcher: a quarter-circle wedged into the bottom-right ---- */
-.launcher {
+/* iOS-style bottom dock: a small frosted pill, centered. */
+
+.dock {
   position: fixed;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
   z-index: 65;
-  width: clamp(96px, 13vw, 124px);
-  height: clamp(96px, 13vw, 124px);
-  padding: 0;
-  border: none;
-  border-top-left-radius: 100%;
-  background: radial-gradient(
-    circle at 100% 100%,
-    var(--ink-panel-raised) 0%,
-    var(--ink-panel) 62%,
-    color-mix(in srgb, var(--ink-deep) 80%, var(--phosphor) 20%) 100%
-  );
-  box-shadow:
-    -6px -6px 28px color-mix(in srgb, var(--paper) 12%, transparent),
-    inset 1px 1px 0 color-mix(in srgb, var(--phosphor) 22%, transparent);
-  color: var(--paper);
-  border: 1px solid var(--line-cyan-dim);
-  border-right: none;
-  border-bottom: none;
-  cursor: pointer;
-  overflow: hidden;
-  isolation: isolate;
-  /* 2x bigger, pinned to the corner: scaling from the bottom-right origin
-     grows the wedge up and to the left instead of shifting its anchor, so
-     it still reads as tucked into the corner rather than floating. */
-  transform: scale(2);
-  transform-origin: bottom right;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(420px, calc(100vw - 28px));
+  pointer-events: none;
 }
 
-/* The warble: a soft blob that morphs continuously, faster on hover, so the
-   corner reads as "alive" without ever moving the hit area. */
+.dock > * {
+  pointer-events: auto;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.launcher,
+.promptBar,
+.bubble,
+.thinkingBubble,
+.errorBubble,
+.flatBubble {
+  border: 1px solid color-mix(in srgb, var(--line-cyan-dim) 80%, var(--phosphor) 20%);
+  background: color-mix(in srgb, var(--ink-panel-raised) 78%, transparent);
+  backdrop-filter: blur(18px) saturate(1.2);
+  box-shadow:
+    0 8px 28px color-mix(in srgb, var(--paper) 10%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 55%, transparent);
+}
+
+.launcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  color: var(--paper);
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.launcher:hover .launcherText,
+.launcher:focus-visible .launcherText {
+  color: var(--phosphor);
+}
+
 .warble {
   position: absolute;
-  right: -18%;
-  bottom: -18%;
-  width: 130%;
-  height: 130%;
+  inset: -40%;
   background: radial-gradient(
-    circle at 72% 72%,
-    color-mix(in srgb, var(--phosphor) 22%, transparent),
-    transparent 68%
+    circle at 50% 80%,
+    color-mix(in srgb, var(--phosphor) 18%, transparent),
+    transparent 62%
   );
   border-radius: 46% 54% 60% 40% / 52% 44% 56% 48%;
   animation: warble 7s ease-in-out infinite;
@@ -70,42 +93,14 @@
   animation-duration: 2.4s;
 }
 
-/* Concentric wave rings that ripple outward from the corner on hover. */
 .wave {
-  position: absolute;
-  right: -6px;
-  bottom: -6px;
-  width: 74%;
-  height: 74%;
-  border: 1px solid color-mix(in srgb, var(--phosphor) 45%, transparent);
-  border-top-left-radius: 100%;
-  opacity: 0;
-  transform-origin: 100% 100%;
-}
-
-.launcher:hover .wave,
-.launcher:focus-visible .wave {
-  animation: ripple 1.5s ease-out infinite;
-}
-
-@keyframes ripple {
-  0% {
-    opacity: 0.75;
-    transform: scale(0.55);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.9);
-  }
+  display: none;
 }
 
 .launcherInner {
-  position: absolute;
-  right: 14px;
-  bottom: 15px;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .launcherDot {
@@ -129,57 +124,41 @@
 
 .launcherText {
   font-family: var(--font-mono);
-  font-size: 0.76rem;
-  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--paper);
 }
 
-.launcher:hover .launcherText {
-  color: var(--phosphor);
-}
-
-/* ---- Floating cluster: no scrim, so the page stays fully interactive ---- */
-.cluster {
-  position: fixed;
-  inset: 0;
-  z-index: 66;
-  pointer-events: none;
-}
-
-.promptBubble {
-  pointer-events: auto;
-  position: absolute;
-  right: clamp(16px, 4vw, 26px);
-  bottom: clamp(112px, 15vw, 140px);
+.promptBar {
   display: flex;
   align-items: center;
-  gap: 9px;
-  width: min(340px, calc(100vw - 34px));
-  padding: 10px 12px;
-  border: 1px solid var(--line-cyan);
-  border-radius: 22px 22px 6px 22px;
-  background: rgba(10, 19, 16, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 8px 0 14px;
+  border-radius: 999px;
 }
 
 .promptLabel {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--amber);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--phosphor);
   white-space: nowrap;
 }
 
 .input {
   flex: 1;
   min-width: 0;
+  height: 100%;
   background: transparent;
   border: none;
   outline: none;
   color: var(--paper);
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
 }
 
 .input::placeholder {
@@ -189,9 +168,9 @@
 .go {
   flex-shrink: 0;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.04em;
-  padding: 6px 10px;
+  padding: 6px 11px;
   border: 1px solid var(--phosphor-dim);
   border-radius: 999px;
   background: transparent;
@@ -202,7 +181,7 @@
 
 .go:hover:not(:disabled) {
   background: var(--phosphor);
-  color: var(--ink-deep);
+  color: var(--ink-panel);
 }
 
 .go:disabled {
@@ -210,65 +189,39 @@
   cursor: default;
 }
 
-/* ---- Suggestion bubbles, arcing up and left out of the corner ---- */
 .bubble {
-  pointer-events: auto;
-  position: absolute;
-  max-width: min(250px, calc(100vw - 40px));
-  padding: 8px 13px;
-  border: 1px solid var(--line-cyan);
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(15, 27, 22, 0.93);
-  backdrop-filter: blur(8px);
   color: var(--paper);
   font-family: var(--font-sans);
-  font-size: 0.79rem;
+  font-size: 0.78rem;
   text-align: left;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: border-color 150ms ease, color 150ms ease, transform 150ms ease;
 }
 
 .bubble:hover {
-  border-color: var(--amber);
-  color: var(--amber);
-  transform: translateY(-2px);
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+  transform: translateY(-1px);
 }
 
-.bubble0 {
-  right: clamp(18px, 4.5vw, 30px);
-  bottom: clamp(172px, 21vw, 202px);
-}
-
-.bubble1 {
-  right: clamp(46px, 9vw, 74px);
-  bottom: clamp(226px, 27vw, 258px);
-}
-
-.bubble2 {
-  right: clamp(96px, 16vw, 140px);
-  bottom: clamp(278px, 33vw, 312px);
-}
-
+.bubble0,
+.bubble1,
+.bubble2,
 .bubble3 {
-  right: clamp(160px, 24vw, 226px);
-  bottom: clamp(326px, 39vw, 362px);
+  position: static;
+  right: auto;
+  bottom: auto;
+  max-width: none;
 }
 
-/* ---- Thinking / error / fallback bubbles ---- */
 .thinkingBubble,
 .errorBubble,
 .flatBubble {
-  pointer-events: auto;
-  position: absolute;
-  right: clamp(16px, 4vw, 26px);
-  bottom: clamp(172px, 21vw, 202px);
+  width: 100%;
   padding: 10px 14px;
-  border: 1px solid var(--line-cyan);
-  border-radius: 18px 18px 18px 4px;
-  background: rgba(10, 19, 16, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.5);
+  border-radius: 18px;
 }
 
 .thinkingBubble {
@@ -276,14 +229,14 @@
   align-items: center;
   gap: 10px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
 }
 
 .spinner {
   width: 13px;
   height: 13px;
-  border: 2px solid var(--line-cyan);
+  border: 2px solid var(--line-cyan-dim);
   border-top-color: var(--phosphor);
   border-radius: 50%;
   animation: spin 750ms linear infinite;
@@ -296,15 +249,10 @@
 }
 
 .errorBubble {
-  max-width: min(320px, calc(100vw - 40px));
   font-family: var(--font-sans);
   font-size: 0.82rem;
   color: var(--amber);
-  border-color: var(--amber-dim);
-}
-
-.flatBubble {
-  width: min(330px, calc(100vw - 34px));
+  border-color: color-mix(in srgb, var(--amber) 45%, var(--line-cyan-dim));
 }
 
 .flatText {
@@ -326,7 +274,7 @@
   font-family: var(--font-mono);
   font-size: 0.68rem;
   padding: 4px 9px;
-  border: 1px solid var(--line-cyan);
+  border: 1px solid var(--line-cyan-dim);
   border-radius: 999px;
   background: transparent;
   color: var(--paper);
@@ -348,31 +296,29 @@
   color: var(--amber);
 }
 
-/* ---- Dismiss-graph button, tucked in beside the launcher ---- */
+.homeTick {
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 22%, transparent);
+  pointer-events: none;
+}
+
 .trash {
   position: fixed;
-  /* Clears the launcher wedge, which — now scaled 2x from its bottom-right
-     origin — occupies roughly clamp(192px, 26vw, 248px) of the corner
-     (double the un-scaled clamp(96px, 13vw, 124px) box). Offsets below are
-     bumped to match so the trash button still sits just past the wedge
-     instead of getting covered by it. z-index sits above the launcher so
-     the button is actually reachable — inside the graph layer (z-index 60)
-     it was buried under the wedge. */
-  right: clamp(208px, 27vw, 268px);
-  bottom: clamp(40px, 6.8vw, 60px);
+  left: calc(50% + min(210px, 42vw) + 10px);
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 6px));
   z-index: 67;
   width: 36px;
   height: 36px;
   display: grid;
   place-items: center;
   padding: 0;
-  border: 1px solid var(--line-cyan);
+  border: 1px solid var(--line-cyan-dim);
   border-radius: 50%;
-  /* Slightly more transparent than before (was 0.94) so the graph behind it
-     shows through a bit. */
-  background: rgba(10, 19, 16, 0.72);
-  backdrop-filter: blur(9px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+  background: color-mix(in srgb, var(--ink-panel-raised) 78%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--paper) 10%, transparent);
   color: var(--text-muted);
   cursor: pointer;
   transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
@@ -381,12 +327,10 @@
 .trash:hover {
   color: var(--amber);
   border-color: var(--amber);
-  background: rgba(10, 19, 16, 0.9);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .warble,
-  .wave,
   .launcherDot,
   .spinner {
     animation: none;
