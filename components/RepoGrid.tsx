@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import {
   motion,
   useScroll,
@@ -11,18 +10,35 @@ import {
   useMotionValueEvent,
   type MotionValue,
 } from "motion/react";
-import { DOMAIN_LABEL, DOMAIN_EMOJI, Domain, GithubRepo, classifyDomain } from "@/lib/github";
-import { PINNED_REPOS, REPO_SCREENSHOTS } from "@/lib/content";
+import {
+  DOMAIN_LABEL,
+  DOMAIN_EMOJI,
+  Domain,
+  GithubRepo,
+  classifyDomain,
+  popularityScore,
+} from "@/lib/github";
+import { PINNED_REPOS } from "@/lib/content";
+import ProjectMark from "./ProjectMark";
 import styles from "./RepoGrid.module.css";
 
-// Carousel geometry. Exposed to CSS as custom properties (see trackVars
-// below) so the module.css track/card sizing can never drift out of sync
-// with the JS that computes scroll distance and translation.
-const CARD_WIDTH = 300;
-const CARD_GAP = 32;
-const STEP = CARD_WIDTH + CARD_GAP;
-const VIEWPORT_HEIGHT = 480; // px height of the sticky "window" onto the track
-const SCROLL_PER_CARD = 380; // px of spacer scroll consumed rotating one card in
+const GITHUB_PROFILE_URL = "https://github.com/ylemiesa57?tab=repositories";
+
+// "AI/ML and software engineering" -- the two classifyDomain buckets that
+// actually describe Yaphet's focus, out of the four (hardware/ai_ml/systems/
+// data). Everything else is left off the featured carousel for now.
+const FEATURED_DOMAINS: Domain[] = ["ai_ml", "systems"];
+const MAX_FEATURED = 8;
+
+// Arc geometry for the semicircular carousel. Each card sits at an angle
+// derived from (its index - scroll progress), positioned with sin/cos onto
+// a real circular arc rather than a straight track -- this is what makes it
+// "semicircular" instead of a linear filmstrip.
+const ANGLE_STEP = 15; // degrees between adjacent card slots
+const MAX_ANGLE = 68; // beyond this a card is fully faded out
+const ARC_RADIUS = 620; // px, radius of the arc cards travel along
+const VIEWPORT_HEIGHT = 460;
+const SCROLL_PER_CARD = 340;
 
 function formatPushed(iso: string): string {
   const date = new Date(iso);
@@ -33,43 +49,27 @@ function formatPushed(iso: string): string {
   return `pushed ${date.toLocaleDateString("en-US", { month: "short", year: "numeric" })}`;
 }
 
-// The two accent hues the site actually has (phosphor green via
-// --signal-amber, and the dimmer graticule cyan) split across the four
-// domains, so the fallback panel still reads as "domain-tinted" without
-// inventing a new palette.
-const DOMAIN_TINT: Record<Domain, "amber" | "cyan"> = {
-  hardware: "amber",
-  ai_ml: "amber",
-  systems: "cyan",
-  data: "cyan",
-};
+// Ambient decoration: real emoji drifting slowly behind the card arc. Purely
+// visual, aria-hidden -- distinct from the small per-card domain emoji
+// ProjectMark's glyphs already carry.
+const FLOAT_EMOJI = [DOMAIN_EMOJI.ai_ml, DOMAIN_EMOJI.systems, DOMAIN_EMOJI.hardware, DOMAIN_EMOJI.data, DOMAIN_EMOJI.ai_ml];
 
-// Screenshot panel for the enlarged center card: a real screenshot if one has
-// been sourced and approved, otherwise a domain-tinted gradient with the
-// domain's emoji large and centered. Screenshots, once available, are static
-// assets at `public/screenshots/<repo-name>.png`, wired in via
-// REPO_SCREENSHOTS in lib/content.ts -- this component doesn't change when
-// they're added, it just starts rendering an <img> instead of the gradient.
-function ScreenshotPanel({ repo, domain }: { repo: GithubRepo; domain: Domain }) {
-  const src = REPO_SCREENSHOTS[repo.name];
-  if (src) {
-    return (
-      <div className={styles.media}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={`${repo.name} screenshot`}
-          className={styles.mediaImg}
-          loading="lazy"
-        />
-      </div>
-    );
-  }
+function FloatingEmoji() {
   return (
-    <div className={styles.media} data-tint={DOMAIN_TINT[domain]}>
-      <span className={styles.mediaEmoji} aria-hidden="true">
-        {DOMAIN_EMOJI[domain]}
-      </span>
+    <div className={styles.emojiField} aria-hidden="true">
+      {FLOAT_EMOJI.map((e, i) => {
+        const style = {
+          "--fx": `${8 + i * 21}%`,
+          "--fy": `${18 + (i % 2) * 48}%`,
+          "--fdelay": `${i * 1.1}s`,
+          "--fdur": `${7 + i * 1.4}s`,
+        } as CSSProperties;
+        return (
+          <span key={i} className={styles.floatEmoji} style={style}>
+            {e}
+          </span>
+        );
+      })}
     </div>
   );
 }
@@ -91,15 +91,31 @@ function CarouselCard({
 }) {
   const domain = classifyDomain(repo);
 
-  // Distance (in card-widths) from this card's slot to wherever the track
-  // currently sits. Drives a continuous scale/opacity/z-index falloff so
-  // cards grow smoothly as they approach center rather than popping.
-  const distance = useTransform(progress, (p) =>
-    Math.abs(p * Math.max(total - 1, 1) - index)
+  // Angle (degrees) of this card's slot relative to center, as scroll
+  // progress sweeps the whole arc. index 0 sits at the positive end and
+  // rotates through 0 (dead center) to negative as progress -> 1.
+  const angle = useTransform(
+    progress,
+    (p) => (index - p * Math.max(total - 1, 1)) * ANGLE_STEP
   );
-  const scale = useTransform(distance, [0, 1, 2], [1.1, 0.86, 0.76]);
-  const opacity = useTransform(distance, [0, 1, 2.2], [1, 0.55, 0.3]);
-  const z = useTransform(distance, (d) => Math.max(1, Math.round(3 - d)));
+  const x = useTransform(angle, (a) => Math.sin((a * Math.PI) / 180) * ARC_RADIUS);
+  // Cards curve down and back as they swing away from center, so the arc
+  // reads as a real semicircle (a fan spread below the centerline) instead
+  // of a flat row that merely rotates in place.
+  const y = useTransform(
+    angle,
+    (a) => (1 - Math.cos((a * Math.PI) / 180)) * ARC_RADIUS * 0.32
+  );
+  const rotate = useTransform(angle, (a) => a * 0.55);
+  const scale = useTransform(angle, (a) => {
+    const t = Math.min(Math.abs(a) / MAX_ANGLE, 1);
+    return 1.05 - t * 0.4;
+  });
+  const opacity = useTransform(angle, (a) => {
+    const t = Math.min(Math.abs(a) / MAX_ANGLE, 1);
+    return t >= 1 ? 0 : 1 - t * 0.85;
+  });
+  const zIndex = useTransform(angle, (a) => Math.round(200 - Math.abs(a)));
 
   return (
     <motion.a
@@ -107,20 +123,14 @@ function CarouselCard({
       target="_blank"
       rel="noopener noreferrer"
       className={`${styles.card} ${isCenter ? styles.cardCenter : ""}`}
-      style={{ scale, opacity, zIndex: z }}
+      style={{ x, y, rotate, scale, opacity, zIndex }}
     >
+      <ProjectMark repoName={repo.name} domain={domain} active={isCenter} />
+
       <div className={styles.cardTop}>
         <span className={styles.domain}>{DOMAIN_LABEL[domain]}</span>
         {pinned && <span className={styles.pin}>PINNED</span>}
       </div>
-
-      {isCenter ? (
-        <ScreenshotPanel repo={repo} domain={domain} />
-      ) : (
-        <div className={styles.mediaSide} data-tint={DOMAIN_TINT[domain]} aria-hidden="true">
-          <span className={styles.mediaEmojiSide}>{DOMAIN_EMOJI[domain]}</span>
-        </div>
-      )}
 
       <div className={styles.repoName}>{repo.name}</div>
 
@@ -141,9 +151,9 @@ function CarouselCard({
   );
 }
 
-// Non-JS-motion fallback: every module in a single wrapped, natively
-// scrollable row. Used verbatim under prefers-reduced-motion, so nobody who
-// has that preference set gets the pinned-scroll track at all.
+// Non-JS-motion fallback: every featured module in a single wrapped,
+// natively scrollable row. Used verbatim under prefers-reduced-motion, so
+// nobody with that preference gets the arc/scroll-jacked track at all.
 function StaticRow({ repos, pinnedSet }: { repos: GithubRepo[]; pinnedSet: Set<string> }) {
   return (
     <div className={styles.staticRow}>
@@ -157,11 +167,11 @@ function StaticRow({ repos, pinnedSet }: { repos: GithubRepo[]; pinnedSet: Set<s
             rel="noopener noreferrer"
             className={styles.card}
           >
+            <ProjectMark repoName={repo.name} domain={domain} />
             <div className={styles.cardTop}>
               <span className={styles.domain}>{DOMAIN_LABEL[domain]}</span>
               {pinnedSet.has(repo.name) && <span className={styles.pin}>PINNED</span>}
             </div>
-            <ScreenshotPanel repo={repo} domain={domain} />
             <div className={styles.repoName}>{repo.name}</div>
             {repo.description ? (
               <p className={styles.desc}>{repo.description}</p>
@@ -181,20 +191,29 @@ function StaticRow({ repos, pinnedSet }: { repos: GithubRepo[]; pinnedSet: Set<s
 
 export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
   const pinnedSet = new Set(PINNED_REPOS);
-  const pinned = repos.filter((r) => pinnedSet.has(r.name));
-  const unpinned = repos.filter((r) => !pinnedSet.has(r.name));
-  const ordered = [...pinned, ...unpinned];
+  const featuredDomains = new Set(FEATURED_DOMAINS);
+
+  // Only AI/ML + software-engineering-flavored repos are eligible; pinned
+  // picks lead, the rest fill in by real traction (stars/forks/watchers),
+  // capped to MAX_FEATURED. Anything past that lives on GitHub itself --
+  // see the "see more" link below, not an inline expander.
+  const eligible = repos.filter((r) => featuredDomains.has(classifyDomain(r)));
+  const pinned = eligible.filter((r) => pinnedSet.has(r.name));
+  const unpinned = eligible
+    .filter((r) => !pinnedSet.has(r.name))
+    .sort((a, b) => popularityScore(b) - popularityScore(a));
+  const ordered = [...pinned, ...unpinned].slice(0, MAX_FEATURED);
   const total = ordered.length;
 
   const spacerRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Scroll progress through the tall spacer below drives horizontal
-  // translation of the card track inside the sticky viewport -- a "pin and
-  // translate" section, scoped to this <section> only (not full-page
-  // scroll-jacking: the rest of the page scrolls completely normally before
-  // and after this element).
+  // Scroll progress through the tall spacer below drives the arc sweep --
+  // scoped to this <section> only (not full-page scroll-jacking: the page
+  // scrolls completely normally before and after it). The heading + arc
+  // together are the sticky unit, so "Modules" stays on screen the whole
+  // time the carousel is being scrolled through.
   const { scrollYProgress } = useScroll({
     target: spacerRef,
     offset: ["start start", "end end"],
@@ -210,38 +229,31 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
     setActiveIndex(Math.min(Math.max(idx, 0), Math.max(total - 1, 0)));
   });
 
-  const maxTranslate = Math.max(total - 1, 0) * STEP;
-  const trackX = useTransform(smoothProgress, [0, 1], [0, -maxTranslate]);
-
-  const trackVars = {
-    "--card-w": `${CARD_WIDTH}px`,
-    "--card-gap": `${CARD_GAP}px`,
-  } as React.CSSProperties;
-
   return (
     <section className={styles.section}>
-      <div className={styles.heading}>
-        <h2 className={styles.title}>Modules</h2>
-        <span className={styles.count}>{repos.length} loaded</span>
-      </div>
-      <p className={styles.sub}>
-        Ranked by real traction — stars, forks, then watchers — with pushed
-        date as a tiebreaker, and a couple pinned by hand regardless of rank.
-        {total > 0 && !reduce ? " Scroll to rotate through every module." : ""}
-      </p>
+      <div
+        ref={spacerRef}
+        className={styles.spacer}
+        style={{ height: `${total * SCROLL_PER_CARD + VIEWPORT_HEIGHT}px` }}
+      >
+        <div className={styles.pinned}>
+          <div className={styles.heading}>
+            <h2 className={styles.title}>Modules</h2>
+            <span className={styles.count}>{total} featured · AI/ML &amp; software</span>
+          </div>
+          <p className={styles.sub}>
+            {total > 0 && !reduce
+              ? "Scroll to swing through the arc -- pinned picks lead, ranked by real traction after that."
+              : "Pinned picks, ranked by real traction after that."}
+          </p>
 
-      {total === 0 ? (
-        <p className={styles.descEmpty}>No modules loaded.</p>
-      ) : reduce ? (
-        <StaticRow repos={ordered} pinnedSet={pinnedSet} />
-      ) : (
-        <div
-          ref={spacerRef}
-          className={styles.spacer}
-          style={{ height: `${total * SCROLL_PER_CARD + VIEWPORT_HEIGHT}px` }}
-        >
-          <div className={styles.viewport} style={{ height: `${VIEWPORT_HEIGHT}px` }}>
-            <motion.div className={styles.track} style={{ ...trackVars, x: trackX }}>
+          {total === 0 ? (
+            <p className={styles.descEmpty}>No AI/ML or software modules loaded.</p>
+          ) : reduce ? (
+            <StaticRow repos={ordered} pinnedSet={pinnedSet} />
+          ) : (
+            <div className={styles.viewport} style={{ height: `${VIEWPORT_HEIGHT}px` }}>
+              <FloatingEmoji />
               {ordered.map((repo, i) => (
                 <CarouselCard
                   key={repo.id}
@@ -253,10 +265,19 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
                   isCenter={i === activeIndex}
                 />
               ))}
-            </motion.div>
-          </div>
+            </div>
+          )}
+
+          <a
+            href={GITHUB_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.seeMore}
+          >
+            See every repo on GitHub ↗
+          </a>
         </div>
-      )}
+      </div>
     </section>
   );
 }

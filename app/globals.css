@@ -39,6 +39,11 @@ body {
   margin: 0;
   background: var(--ink-deep);
   color: var(--paper);
+  /* Belt-and-suspenders: a few sections use wide/absolutely-positioned
+     elements (e.g. the Modules carousel's arc) that can exceed the
+     viewport during their scroll-driven transforms. Nothing should ever
+     need horizontal page scroll, so clip it outright. */
+  overflow-x: hidden;
 }
 
 body {

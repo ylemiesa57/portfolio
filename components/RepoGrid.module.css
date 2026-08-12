@@ -3,6 +3,22 @@
   border-bottom: 1px solid var(--line-cyan-dim);
 }
 
+/* ---- Carousel: tall spacer + a sticky unit that pins heading + arc
+   together ----
+   .spacer's height (set inline, proportional to featured count) is the
+   amount of vertical scroll it takes to sweep through every module.
+   .pinned sticks to the top of the viewport while the spacer scrolls past
+   underneath it -- so "Modules" and the subtitle stay visible the whole
+   time the arc is being scrolled through, not just the card viewport. */
+.spacer {
+  position: relative;
+}
+
+.pinned {
+  position: sticky;
+  top: 16px;
+}
+
 .heading {
   display: flex;
   align-items: baseline;
@@ -28,23 +44,11 @@
   font-size: 0.92rem;
   color: var(--text-muted);
   max-width: 560px;
-  margin-bottom: 32px;
-}
-
-/* ---- Carousel: tall spacer + sticky viewport ----
-   .spacer's height (set inline, proportional to repo count) is the amount of
-   vertical scroll it takes to rotate through every module. .viewport pins
-   itself to the top of the scroll container while the spacer scrolls past
-   underneath it, and the track inside translates horizontally in lockstep
-   with that scroll -- motion is scoped to this section only, the page
-   scrolls normally immediately before and after it. */
-.spacer {
-  position: relative;
+  margin-bottom: 24px;
 }
 
 .viewport {
-  position: sticky;
-  top: 16px;
+  position: relative;
   overflow: hidden;
   border: 1px solid var(--line-cyan-dim);
   border-radius: var(--radius);
@@ -60,7 +64,7 @@
   border: 1.5px solid var(--signal-amber-dim);
   opacity: 0.7;
   pointer-events: none;
-  z-index: 4;
+  z-index: 250;
 }
 
 .viewport::before {
@@ -77,36 +81,55 @@
   border-top: none;
 }
 
-.track {
+/* Ambient floating emoji, behind every card (z-index below the 100+ range
+   CarouselCard computes). Positioned via --fx/--fy custom properties set
+   per-instance in RepoGrid.tsx. */
+.emojiField {
   position: absolute;
-  top: 0;
-  left: 50%;
-  /* Centers card 0 in the viewport at scroll progress 0; translateX (applied
-     as the `x` motion value) then shifts subsequent cards into center. */
-  margin-left: calc(var(--card-w, 300px) / -2);
-  height: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--card-gap, 32px);
-  will-change: transform;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
+.floatEmoji {
+  position: absolute;
+  left: var(--fx);
+  top: var(--fy);
+  font-size: 2.1rem;
+  opacity: 0.22;
+  filter: saturate(0.7);
+  animation: emojiFloat var(--fdur, 8s) ease-in-out infinite;
+  animation-delay: var(--fdelay, 0s);
+}
+
+@keyframes emojiFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(4deg);
+  }
+}
+
+/* Each card is positioned via motion values (x, y, rotate, scale, opacity)
+   computed in RepoGrid.tsx from its angle along the arc -- this anchor
+   (absolute, centered) is the origin all of that offsets from. */
 .card {
-  position: relative;
-  flex: 0 0 var(--card-w, 300px);
-  width: var(--card-w, 300px);
-  height: calc(100% - 48px);
-  padding: 20px 20px 18px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 224px;
+  margin: -160px 0 0 -112px;
+  padding: 16px 16px 14px;
   background: var(--ink-panel-raised);
   border: 1px solid var(--line-cyan-dim);
   border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   text-decoration: none;
   color: inherit;
-  overflow: hidden;
-  transform-origin: center;
   transition: border-color 160ms ease;
 }
 
@@ -136,6 +159,8 @@
 }
 
 .cardCenter {
+  width: 268px;
+  margin-left: -134px;
   border-color: var(--signal-amber-dim);
   background: var(--ink-panel);
 }
@@ -175,66 +200,9 @@
   border-radius: var(--radius);
 }
 
-/* Center-card media panel: real screenshot, or the gradient+emoji fallback
-   rendered by ScreenshotPanel when no screenshotUrl exists yet. */
-.media {
-  position: relative;
-  flex: 0 0 auto;
-  height: 128px;
-  border: 1px solid var(--line-cyan-dim);
-  border-radius: var(--radius);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.media[data-tint="amber"] {
-  background: linear-gradient(155deg, var(--ink-panel) 0%, var(--signal-amber-dim) 220%);
-}
-
-.media[data-tint="cyan"] {
-  background: linear-gradient(155deg, var(--ink-panel) 0%, var(--line-cyan) 220%);
-}
-
-.mediaImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mediaEmoji {
-  font-size: 2.4rem;
-  filter: saturate(0.85);
-}
-
-/* Side-card marker: no screenshot attempt at all, just the domain emoji --
-   these cards exist to be recognized at a glance, not read. */
-.mediaSide {
-  flex: 0 0 auto;
-  height: 64px;
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
-}
-
-.mediaSide[data-tint="amber"] {
-  background: color-mix(in srgb, var(--signal-amber-dim) 22%, transparent);
-}
-
-.mediaSide[data-tint="cyan"] {
-  background: color-mix(in srgb, var(--line-cyan) 22%, transparent);
-}
-
-.mediaEmojiSide {
-  font-size: 1.5rem;
-}
-
 .repoName {
   font-family: var(--font-mono);
-  font-size: 1.02rem;
+  font-size: 0.92rem;
   font-weight: 600;
   color: var(--paper);
   word-break: break-word;
@@ -242,7 +210,7 @@
 }
 
 .desc {
-  font-size: 0.87rem;
+  font-size: 0.83rem;
   line-height: 1.5;
   color: var(--line-cyan);
   flex: 1;
@@ -264,18 +232,38 @@
   align-items: center;
   justify-content: space-between;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: var(--text-muted);
   border-top: 1px dashed var(--line-cyan-dim);
-  padding-top: 10px;
+  padding-top: 8px;
   flex: 0 0 auto;
 }
 
+.seeMore {
+  display: inline-block;
+  margin-top: 22px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--signal-amber);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--signal-amber-dim);
+  padding-bottom: 2px;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.seeMore:hover,
+.seeMore:focus-visible {
+  color: var(--paper);
+  border-color: var(--paper);
+}
+
 /* ---- Reduced-motion fallback ----
-   Rendered by RepoGrid instead of the spacer/viewport/track above whenever
+   Rendered by RepoGrid instead of the spacer/viewport/arc above whenever
    useReducedMotion() is true, so nobody with that preference gets the
-   scroll-linked track mounted at all -- just every module in a plain
-   wrapping, natively scrollable row. */
+   scroll-linked track mounted at all -- just every featured module in a
+   plain wrapping, natively scrollable row. */
 .staticRow {
   display: flex;
   flex-wrap: wrap;
@@ -283,13 +271,25 @@
 }
 
 .staticRow .card {
-  flex: 0 1 268px;
-  width: 268px;
+  position: relative;
+  top: auto;
+  left: auto;
+  margin: 0;
+  flex: 0 1 240px;
+  width: 240px;
   height: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .card {
     transition: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .card,
+  .cardCenter {
+    width: 190px;
+    margin-left: -95px;
   }
 }
