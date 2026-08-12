@@ -24,3 +24,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# graph ingest: intermediate JSON dump (nodes/edges/embeddings) between
+# scripts/ingest.ts and scripts/build_snapshot.py. Not committed -- only the
+# resulting backend/graph_data/snapshot.bolt is (that's the served artifact).
+/graph-data/
+
+# Python
+__pycache__/
+*.pyc
+backend/.venv/

@@ -18,6 +18,24 @@
   flex-wrap: wrap;
 }
 
+.nav {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.navLink {
+  color: var(--text-muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 150ms ease;
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  color: var(--line-cyan);
+}
+
 .field {
   white-space: nowrap;
 }

@@ -1,5 +1,5 @@
 .hero {
-  padding: 64px var(--sheet-margin) 48px;
+  padding: 56px var(--sheet-margin) 40px;
   border-bottom: 1px solid var(--line-cyan-dim);
 }
 
@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .eyebrowRow .rule {
@@ -24,7 +24,7 @@
   line-height: 0.88;
   letter-spacing: -0.03em;
   text-transform: uppercase;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   color: var(--paper);
 }
 
@@ -44,9 +44,9 @@
 .note {
   max-width: 620px;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 }
 
 .note strong {
@@ -54,17 +54,13 @@
   font-weight: 500;
 }
 
-.traceWrap {
-  max-width: 720px;
-  margin-bottom: 40px;
-}
-
 .stats {
   display: flex;
   flex-wrap: wrap;
   gap: 32px;
   border-top: 1px dashed var(--line-cyan-dim);
-  padding-top: 22px;
+  margin-top: 4px;
+  padding-top: 20px;
 }
 
 .stat {

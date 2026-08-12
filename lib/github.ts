@@ -116,3 +116,14 @@ export const DOMAIN_LABEL: Record<Domain, string> = {
   systems: "SYSTEMS",
   data: "DATA",
 };
+
+// One glyph per domain, used as the fallback face of a module's screenshot
+// panel in the carousel (components/RepoGrid.tsx) when no real screenshot
+// has been sourced yet, and as the small side-card marker for non-centered
+// carousel cards.
+export const DOMAIN_EMOJI: Record<Domain, string> = {
+  hardware: "\u{1F527}", // wrench
+  ai_ml: "\u{1F916}", // robot face
+  systems: "\u{1F5A5}\u{FE0F}", // desktop computer
+  data: "\u{1F4CA}", // bar chart
+};
