@@ -235,4 +235,10 @@ export const ossContributions: OSSContribution[] = [
       "Fixed a validation bug in the SSH provider where SSHRemoteJobOperator's cleanup step raised a spurious error whenever remote_base_dir was customized. Added regression tests. PR open, pending maintainer review.",
     url: "https://github.com/apache/airflow/pull/70233",
   },
+  {
+    repo: "getmoto/moto",
+    description:
+      "Fixed DynamoDB Number attribute size calculation to use significant digits instead of decimal string length, aligning moto's item-size check with real DynamoDB behavior. PR open, pending maintainer review.",
+    url: "https://github.com/getmoto/moto/pull/10182",
+  },
 ];
