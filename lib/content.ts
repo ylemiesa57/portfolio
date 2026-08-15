@@ -241,4 +241,10 @@ export const ossContributions: OSSContribution[] = [
       "Fixed DynamoDB Number attribute size calculation to use significant digits instead of decimal string length, aligning moto's item-size check with real DynamoDB behavior. PR open, pending maintainer review.",
     url: "https://github.com/getmoto/moto/pull/10182",
   },
+  {
+    repo: "f4pga/prjxray",
+    description:
+      "Fixed a verbose-logging bug in the fuzzer's maketodo script where diagnostic output was mixed into stdout, corrupting the todo-list data file consumed downstream in the build. Routed diagnostics to stderr. PR open, pending maintainer review.",
+    url: "https://github.com/f4pga/prjxray/pull/2571",
+  },
 ];
