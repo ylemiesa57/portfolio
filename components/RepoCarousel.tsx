@@ -87,25 +87,50 @@ export default function RepoCarousel({
     }
   }
 
+  // Drag/swipe tracking deliberately avoids Pointer Capture: capturing the
+  // pointer on the carousel root retargets every subsequent pointerup/click
+  // inside it (cards, nav arrows, dots) to the root element itself, which
+  // silently breaks the cards' <a> navigation and the arrow buttons' onClick
+  // -- confirmed via a native event trace where pointerdown correctly hit the
+  // card but pointerup/click landed on the carousel div instead. Tracking the
+  // drag via temporary window listeners (only attached while a pointer is
+  // actually down) gets the same swipe behavior without hijacking clicks.
+  const dragCleanup = useRef<(() => void) | null>(null);
+
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     pointerX.current = event.clientX;
     didSwipe.current = false;
-    event.currentTarget.setPointerCapture(event.pointerId);
+
+    const onMove = (moveEvent: globalThis.PointerEvent) => {
+      if (pointerX.current == null) return;
+      const delta = moveEvent.clientX - pointerX.current;
+      if (Math.abs(delta) < 56) return;
+      didSwipe.current = true;
+      pointerX.current = moveEvent.clientX;
+      go(delta < 0 ? 1 : -1);
+    };
+
+    const onUp = () => {
+      pointerX.current = null;
+      dragCleanup.current?.();
+      dragCleanup.current = null;
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+
+    dragCleanup.current = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
   }
 
-  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (pointerX.current == null) return;
-    const delta = event.clientX - pointerX.current;
-    if (Math.abs(delta) < 56) return;
-    didSwipe.current = true;
-    pointerX.current = event.clientX;
-    go(delta < 0 ? 1 : -1);
-  }
-
-  function onPointerUp() {
-    pointerX.current = null;
-  }
+  useEffect(() => {
+    return () => dragCleanup.current?.();
+  }, []);
 
   if (count === 0) return null;
 
@@ -117,13 +142,10 @@ export default function RepoCarousel({
       className={styles.carousel}
       role="region"
       aria-roledescription="carousel"
-      aria-label="Project modules"
+      aria-label="Projects"
       tabIndex={0}
       onKeyDown={onKeyDown}
       onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
       onClickCapture={(event) => {
         if (!didSwipe.current) return;
         event.preventDefault();

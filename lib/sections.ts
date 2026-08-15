@@ -33,7 +33,7 @@ export const SECTIONS: SectionSpec[] = [
   },
   {
     id: "modules",
-    label: "Modules",
+    label: "Projects",
     keywords:
       "projects, repositories, GitHub repos, code, the things he has built, hardware, AI/ML, systems, data projects, portfolio work",
   },

@@ -79,6 +79,7 @@ export default function ProjectCard({
         href={repo.html_url}
         target="_blank"
         rel="noopener noreferrer"
+        draggable={false}
         tabIndex={interactive ? 0 : -1}
         aria-hidden={interactive ? undefined : true}
         className={`${styles.card} ${hovered ? styles.cardHot : ""}`}

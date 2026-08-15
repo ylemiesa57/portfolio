@@ -1,4 +1,5 @@
 import Image from "next/image";
+import IntroLine from "./IntroLine";
 import styles from "./Hero.module.css";
 
 export type HeroDomain = { label: string; count: number };
@@ -22,6 +23,7 @@ export default function Hero({
     <section className={styles.hero}>
       <div className={styles.stage}>
         <div className={styles.copy}>
+          <IntroLine />
           <h1 className={styles.name}>{name}</h1>
           <p className={styles.tagline}>{tagline}</p>
 

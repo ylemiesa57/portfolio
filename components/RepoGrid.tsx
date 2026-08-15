@@ -20,7 +20,7 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
       <div className={styles.heading}>
         <div>
           <p className={styles.kicker}>selected</p>
-          <h2 className={styles.title}>Modules</h2>
+          <h2 className={styles.title}>Projects</h2>
         </div>
         <span className={styles.count}>{repos.length} loaded</span>
       </div>
@@ -35,7 +35,7 @@ export default function RepoGrid({ repos }: { repos: GithubRepo[] }) {
       {rest.length > 0 && (
         <details className={styles.more}>
           <summary className={styles.moreSummary}>
-            Show {rest.length} more module{rest.length === 1 ? "" : "s"}
+            Show {rest.length} more project{rest.length === 1 ? "" : "s"}
           </summary>
           <div className={`${styles.grid} ${styles.moreGrid}`}>
             {rest.map((repo) => (

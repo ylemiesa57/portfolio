@@ -1,0 +1,41 @@
+.intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--phosphor);
+  margin: 0 0 12px;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 3px;
+  background: var(--phosphor);
+  animation: introBlink 1.05s step-end infinite;
+}
+
+@keyframes introBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+  }
+}
