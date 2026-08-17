@@ -14,7 +14,9 @@ export type GNodeType =
   | "Domain"
   | "Language"
   | "Experience"
-  | "Education";
+  | "Education"
+  | "Project"
+  | "SkillGroup";
 
 export interface GNode {
   /** Stable unique id, e.g. "repo:EmbraceAI", "paper:ai-small-noisy-data". */

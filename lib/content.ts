@@ -22,7 +22,7 @@ export const experience: Experience[] = [
     start: "May 2026",
     end: "Present",
     bullets: [
-      "Architecting a production DevOps agent (Python, AWS EKS, Kubernetes) on an LLM plan-and-act loop with runbook RAG, simulating Bloomberg Media infrastructure across 12+ cluster configurations to deterministically diagnose production failures.",
+      "Architecting a production DevOps agent (Python, AWS EKS, Kubernetes) on an LLM plan-and-act loop with runbook RAG, simulating Bloomberg Media infrastructure across 12+ cluster configurations to deterministically reproduce production failures.",
       "Designing the agent's evaluation architecture (regression suites, LLM-as-judge, golden-trace replay) to validate remediation accuracy pre-deployment, targeting a 60% MTTR reduction across 40+ services.",
     ],
   },
@@ -58,7 +58,8 @@ export const experience: Experience[] = [
     start: "Sept. 2024",
     end: "Present",
     bullets: [
-      "Architected a quantitative simulation (Python, C++) coupling Monte Carlo with a self-learning Bayesian ML loop (PyTorch) that flags zero-day anomalies from network telemetry, forecasting financial exposure at 85% accuracy and guiding $3M in loss mitigation in ICS.",
+      "Architected a quantitative simulation (Python, C++) coupling Monte Carlo with a self-learning Bayesian ML loop (PyTorch) that flags zero-day anomalies from network telemetry, forecasting financial exposure at 85% accuracy and guiding $3M in loss mitigation.",
+      "Co-authored two papers on AI-driven cybersecurity policy accepted at the Winter Simulation Conference (WSC), using the Colonial Pipeline incident as the case study.",
     ],
   },
 ];
@@ -82,12 +83,16 @@ export const education: Education[] = [
     start: "",
     end: "B.S. May 2027, M.Eng May 2028",
     coursework: [
+      "Operating System Engineering",
+      "Distributed Systems",
       "Algorithms",
       "Computation Structures",
+      "Deep Learning",
       "Machine Learning",
       "Hardware Accelerators for AI/ML",
-      "Introduction to Probability I & II",
       "Robotic Manipulation",
+      "Semiconductor Electronic Circuits (6.2080) — differential amplifier system, TSMC 65nm, Cadence Virtuoso, full DRC/LVS sign-off",
+      "Introduction to Probability (6.3700)",
       "Linear Algebra",
       "Dynamic Systems Modeling & Control",
       "Digital Systems Lab",
@@ -208,6 +213,161 @@ export const initiatives: Initiative[] = [
 // Repos pinned into the featured Modules grid regardless of popularity
 // ranking -- for projects worth surfacing even before they've picked up
 // stars/forks (e.g. still-in-progress hardware builds).
+// ---- Skills ------------------------------------------------------------------
+// Context-only (like `experience` and `education`): consumed by scripts/ingest.ts
+// for the knowledge graph, not rendered anywhere on the page.
+//
+// Deliberately grouped into a few rich nodes rather than one node per skill.
+// A node whose whole text is "Python — a language Yaphet uses" is short and
+// near-contentless, which embeds close to the centre of the vector space and
+// therefore scores highly against almost any query — the same failure that made
+// the Domain/Language nodes crowd out real answers before they were excluded
+// from vector seeding. Grouping keeps each node information-dense.
+
+export interface SkillGroup {
+  slug: string;
+  label: string;
+  items: string[];
+}
+
+export const skills: SkillGroup[] = [
+  {
+    slug: "languages",
+    label: "Languages",
+    items: [
+      "Python",
+      "C++",
+      "C",
+      "SQL",
+      "Bash",
+      "Java",
+      "JavaScript/TypeScript",
+      "Go",
+      "Bluespec SystemVerilog",
+    ],
+  },
+  {
+    slug: "frameworks-tools",
+    label: "Frameworks & Tools",
+    items: [
+      "Kubernetes",
+      "AWS (EKS)",
+      "CI/CD",
+      "Docker",
+      "PostgreSQL",
+      "Git",
+      "React",
+      "FastAPI",
+      "Node.js",
+      "Flask",
+      "Kafka",
+      "Spark",
+      "Azure",
+      "Firebase",
+      "PyTorch",
+      "Alembic",
+    ],
+  },
+  {
+    slug: "ai-ml-simulation",
+    label: "AI/ML & Simulation",
+    items: [
+      "PyTorch",
+      "OpenCV",
+      "Fine-tuning (LoRA)",
+      "DistilBERT",
+      "Monte Carlo",
+      "Bayesian Inference",
+      "LLM Agents",
+      "RAG",
+      "Knowledge Graphs",
+      "Vector Stores (FAISS)",
+      "Llama.cpp",
+      "LLM Evaluation (LLM-as-judge, regression suites)",
+      "AccelForge",
+    ],
+  },
+];
+
+// ---- Projects ----------------------------------------------------------------
+// Context-only, same as `skills` above. These are the resume's Projects section:
+// the repos already in the graph carry only their (often empty) GitHub
+// description, so without these the Ask endpoint has no access to what a project
+// actually did or what it measured. `repo` optionally ties a project to its
+// Repo node so the graph links the two.
+//
+// Not included: the RISC-V Processor with SIMD Extensions entry. The resume bank
+// records it as an INCOMPLETE ENTRY whose bullet text and metrics were never
+// captured, and explicitly says to ask rather than reconstruct them — so there
+// is nothing here to state accurately yet. The `riscv-simd-core` Repo node still
+// covers it in the graph. Fill the bullets into the bank and re-run ingest to
+// add it properly.
+
+export interface Project {
+  slug: string;
+  name: string;
+  stack: string;
+  /** Award / venue / timeframe line, if the resume carries one. */
+  note?: string;
+  bullets: string[];
+  /** Name of the matching GitHub repo, when one exists (links Project → Repo). */
+  repo?: string;
+}
+
+export const projects: Project[] = [
+  {
+    slug: "edge-rag-llm-accelerator",
+    name: "Edge RAG LLM Accelerator",
+    stack: "Python, AccelForge, PyTorch",
+    note: "Research Paper 2025–2026",
+    bullets: [
+      "Modelled a Sheared-LLaMA 2.7B system on a Jetson Orin Nano-class platform (8GB shared DRAM) using Einsum-based prefill/decode latency formulations across 5 million-document corpora.",
+      "Reduced retrieval latency by 40% via a DRAM embedding cache / vector store optimizer and structured 4:2 sparsity pruning on the vector index, resolving the memory contention bottleneck between LLM weights and the embedding cache.",
+    ],
+    repo: "6.5931-Final-Project",
+  },
+  {
+    slug: "distributed-data-analytics-pipeline",
+    name: "Distributed Data Analytics Pipeline (HackMIT)",
+    stack: "Python, Apache Spark, Apache Kafka, Docker, AWS S3",
+    bullets: [
+      "Designed a distributed system architecture using Apache Kafka for fault-tolerant streaming and Spark for parallel processing of over 100,000 real-time events.",
+      "Achieved 88% accuracy in real-time trend classification and warehoused processed data in AWS S3 to enable large-scale downstream analysis.",
+    ],
+    repo: "Distributed-Data-Analytics-Pipeline",
+  },
+  {
+    slug: "deucevision",
+    name: "DeuceVision — Open-Source Sports Analytics Tool",
+    stack: "Python, React.js, Flask, OpenCV, GitHub",
+    bullets: [
+      "Managed the full product lifecycle of an open-source sports analytics tool spanning a React.js frontend, Flask REST API backend, and OpenCV/YOLOv9 computer-vision model, from training through a live launch on GitHub reaching 50+ users.",
+    ],
+  },
+  {
+    slug: "embraceai",
+    name: "EmbraceAI",
+    stack: "Python, Transformers, FastAPI, HuggingFace",
+    note: "1st Place, AI CAMP – NLP Track 2023",
+    bullets: [
+      "Won Top NLP Project at HackMIT (200+ teams); built an AI mental-health support system using fine-tuned DistilBERT at 91% intent-classification accuracy across 12 categories, served via a FastAPI inference API at under 80ms end-to-end latency.",
+    ],
+    repo: "EmbraceAI",
+  },
+  {
+    slug: "embraceai-kafka-pipeline",
+    name: "EmbraceAI (Data Pipeline w/ Kafka + Hugging Face Serve)",
+    stack:
+      "Python, Apache Kafka, Apache Spark, Docker, AWS S3, HuggingFace/Transformers (DistilBERT)",
+    note: "Distinct from the EmbraceAI entry above — the distributed-systems architecture repurposed for EmbraceAI's mental-health domain.",
+    bullets: [
+      "Designed a distributed system architecture using Apache Kafka for fault-tolerant streaming and Spark for parallel processing of over 100,000 real-time mental-health support conversations.",
+      "Achieved 91% accuracy classifying conversational risk/sentiment signals in real time via a Hugging Face-served, fine-tuned DistilBERT model, and warehoused processed data in AWS S3 to enable large-scale downstream analysis.",
+    ],
+    repo: "EmbraceAI",
+  },
+];
+
 export const PINNED_REPOS: string[] = ["EmbraceAI", "ai-bom-analysis", "Distributed-Data-Analytics-Pipeline", "6.5931-Final-Project", "visionquest-misti"];
 
 export interface OSSContribution {

@@ -23,7 +23,9 @@ import {
   experience,
   initiatives,
   ossContributions,
+  projects,
   publications,
+  skills,
 } from "../lib/content";
 import { embed } from "../lib/embed";
 import { spawnSync } from "node:child_process";
@@ -207,6 +209,41 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
     }
   }
 
+  // Projects → Project nodes (the resume's Projects section). Repo nodes carry
+  // only their GitHub description, which for several repos is empty, so without
+  // these the graph has no record of what a project did or measured. Linked to
+  // their Repo node where one exists.
+  for (const project of projects) {
+    const id = `project:${project.slug}`;
+    const noteText = project.note ? ` ${project.note}.` : "";
+    add({
+      id,
+      type: "Project",
+      label: project.name,
+      sectionId: "modules",
+      text: `Project: ${project.name}. Stack: ${project.stack}.${noteText} ${project.bullets.join(" ")}`,
+    });
+    link(PERSON_ID, "BUILT", id);
+    if (project.repo) {
+      const repoId = `repo:${project.repo}`;
+      // Only link if that repo actually came back from GitHub this run.
+      if (nodeMap.has(repoId)) link(id, "IMPLEMENTED_BY", repoId);
+    }
+  }
+
+  // Skills → one node per group, not per skill (see lib/content.ts for why).
+  for (const group of skills) {
+    const id = `skillgroup:${group.slug}`;
+    add({
+      id,
+      type: "SkillGroup",
+      label: group.label,
+      sectionId: "hero",
+      text: `${group.label} Yaphet works with: ${group.items.join(", ")}.`,
+    });
+    link(PERSON_ID, "SKILLED_IN", id);
+  }
+
   return { nodes: [...nodeMap.values()], edges };
 }
 
@@ -235,6 +272,8 @@ const SEEDABLE_TYPES = new Set<GNode["type"]>([
   "Paper",
   "Award",
   "Initiative",
+  "Project",
+  "SkillGroup",
 ]);
 
 async function main() {
