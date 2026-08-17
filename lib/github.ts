@@ -103,35 +103,6 @@ export async function getRepos(): Promise<GithubRepo[]> {
     });
 }
 
-/**
- * Fetch a repo's README as raw markdown, for the Projects section's
- * README-derived copy (see lib/readme.ts). Uses the `.raw` media type so we
- * get markdown rather than base64 JSON. Returns null on any failure, matching
- * safeFetch's degrade-quietly-but-log contract.
- *
- * Note this is one extra request per repo at build/revalidate time, which
- * makes an authenticated GITHUB_TOKEN effectively required: unauthenticated
- * callers get 60 requests/hour per IP and this alone would exhaust it.
- */
-export async function getReadme(repoName: string): Promise<string | null> {
-  try {
-    const res = await fetch(`${API}/repos/${USERNAME}/${repoName}/readme`, {
-      headers: { ...authHeaders(), Accept: "application/vnd.github.raw" },
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!res.ok) {
-      if (res.status !== 404) {
-        console.error(`[github] README ${repoName} failed: ${res.status} ${res.statusText}`);
-      }
-      return null;
-    }
-    return await res.text();
-  } catch (err) {
-    console.error(`[github] README ${repoName} threw:`, err);
-    return null;
-  }
-}
-
 // Buckets a repo's language/topics into one of Kiya's real domain areas, so
 // the hero's circuit-trace nodes and the "DOMAIN" tag on each module card
 // reflect actual categories of her work rather than raw GitHub language

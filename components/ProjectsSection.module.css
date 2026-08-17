@@ -355,3 +355,29 @@
     transform: none;
   }
 }
+
+/* Placeholder that occupies the grid slot of the card currently expanded
+   above, so opening a project doesn't reflow the whole grid. */
+.emojiSlot {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  border: 1px dashed var(--line-cyan-dim);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--ink-panel) 55%, transparent);
+}
+
+.emojiGlyph {
+  font-size: 2.4rem;
+  line-height: 1;
+  animation: emojiIn 320ms ease;
+}
+
+@keyframes emojiIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.9); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .emojiGlyph { animation: none; }
+}

@@ -60,6 +60,11 @@ function stripMarkdown(text: string): string {
  */
 export default function Navigator() {
   const reduce = useReducedMotion();
+  // One-time nudge explaining what the Ask button actually is. Most visitors
+  // read "Ask" as a contact form, not a retrieval system over this page's own
+  // knowledge graph, so it's worth saying. Dismissed on first interaction and
+  // hidden once the navigator is open.
+  const [hintDismissed, setHintDismissed] = useState(false);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -280,7 +285,10 @@ export default function Navigator() {
           <button
             type="button"
             className={styles.launcher}
-            onClick={openNav}
+            onClick={() => {
+              setHintDismissed(true);
+              openNav();
+            }}
             aria-label="Ask the blueprint — natural-language navigation"
             aria-expanded={false}
           >
@@ -290,6 +298,23 @@ export default function Navigator() {
               <span className={styles.launcherText}>Ask</span>
             </span>
           </button>
+        )}
+
+        {!hintDismissed && status === "idle" && (
+          <div className={styles.hint} role="note">
+            <span className={styles.hintText}>
+              Click me — I&apos;ll show you how I use RAG to search this page
+              <span className={styles.hintAside}> (built by Yaphet, of course)</span>
+            </span>
+            <button
+              type="button"
+              className={styles.hintClose}
+              onClick={() => setHintDismissed(true)}
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
         )}
 
         <span className={styles.homeTick} aria-hidden="true" />

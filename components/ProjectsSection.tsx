@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { DOMAIN_LABEL, Domain, GithubRepo } from "@/lib/github";
-import type { ProjectReadme } from "@/lib/readme";
+import type { ProjectDetail } from "@/lib/content";
 import ProjectMark from "./ProjectMark";
 import styles from "./ProjectsSection.module.css";
 
@@ -12,7 +12,7 @@ export interface ProjectEntry {
   repo: GithubRepo;
   domain: Domain;
   pinned: boolean;
-  readme: ProjectReadme;
+  detail?: ProjectDetail;
   visual?: string;
   liveUrl?: string;
   /** Rendered on the server. Computing "pushed 3d ago" in the component would
@@ -23,6 +23,29 @@ export interface ProjectEntry {
 
 /** Rows shown before the fade/blur cutoff. */
 const VISIBLE_ROWS = 2;
+
+/** Cycled in the vacated card slot while a project is open. */
+const SLOT_EMOJI = ["🔧", "⚙️", "📐", "🛠️", "🧪", "📎", "🔬", "✏️"];
+const SLOT_EMOJI_MS = 1800;
+
+/** The card the user opened leaves a gap in the grid; fill it with something
+ *  alive rather than a dimmed ghost of the card that moved. Holds still for
+ *  anyone who prefers reduced motion. */
+function EmojiSlot({ reduce }: { reduce: boolean | null }) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    const t = window.setInterval(() => setI((n) => (n + 1) % SLOT_EMOJI.length), SLOT_EMOJI_MS);
+    return () => window.clearInterval(t);
+  }, [reduce]);
+  return (
+    <div className={styles.emojiSlot} aria-hidden="true">
+      <span key={i} className={styles.emojiGlyph}>
+        {SLOT_EMOJI[i]}
+      </span>
+    </div>
+  );
+}
 
 function Visual({ entry, large }: { entry: ProjectEntry; large?: boolean }) {
   if (entry.visual) {
@@ -78,8 +101,8 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
         <span className={styles.count}>{entries.length} loaded</span>
       </div>
       <p className={styles.sub}>
-        Pulled live from GitHub, with each card&apos;s write-up read from that
-        repo&apos;s own README. Click one to open it.
+        Pulled live from GitHub. Click any project for what it is, why I built
+        it, and what the tradeoffs taught me.
       </p>
 
       <AnimatePresence mode="wait">
@@ -117,26 +140,31 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
               </div>
 
               <h3 className={styles.panelName}>{open.repo.name}</h3>
-              <p className={styles.panelSummary}>{open.readme.summary}</p>
 
-              {open.readme.findings && (
+              <div className={styles.block}>
+                <h4 className={styles.blockTitle}>What it is</h4>
+                <p className={styles.blockBody}>
+                  {open.detail?.what ?? open.repo.description ?? "No description yet."}
+                </p>
+              </div>
+
+              {open.detail?.why && (
                 <div className={styles.block}>
-                  <h4 className={styles.blockTitle}>What&apos;s in it</h4>
-                  <p className={styles.blockBody}>{open.readme.findings}</p>
+                  <h4 className={styles.blockTitle}>Why I built it</h4>
+                  <p className={styles.blockBody}>{open.detail.why}</p>
                 </div>
               )}
 
-              {open.readme.tradeoffs && (
+              {open.detail?.learned && (
                 <div className={styles.block}>
-                  <h4 className={styles.blockTitle}>Tradeoffs &amp; limits</h4>
-                  <p className={styles.blockBody}>{open.readme.tradeoffs}</p>
+                  <h4 className={styles.blockTitle}>Tradeoffs &amp; what I learned</h4>
+                  <p className={styles.blockBody}>{open.detail.learned}</p>
                 </div>
               )}
 
-              {!open.readme.hasDepth && (
+              {!open.detail && (
                 <p className={styles.thin}>
-                  This repo&apos;s README is still light on write-up — the full
-                  source is the better read for now.
+                  Write-up still to come — the repo is the better read for now.
                 </p>
               )}
 
@@ -164,14 +192,20 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
         <div className={styles.grid}>
           {entries.map((entry) => {
             const isOpen = entry.repo.id === openId;
+            if (isOpen) {
+              // The card itself has warped up into the panel above, so this
+              // slot would otherwise collapse and reflow the whole grid.
+              return <EmojiSlot key={entry.repo.id} reduce={reduce} />;
+            }
             return (
               <motion.button
                 key={entry.repo.id}
                 type="button"
                 layoutId={`project-${entry.repo.id}`}
-                className={`${styles.card} ${isOpen ? styles.cardOpen : ""}`}
+                className={styles.card}
+                data-project-card=""
                 onClick={() => setOpenId(isOpen ? null : entry.repo.id)}
-                aria-expanded={isOpen}
+                aria-expanded={false}
                 transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 260, damping: 30 }}
               >
                 <span className={styles.cardVisual}>

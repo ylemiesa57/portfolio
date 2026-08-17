@@ -336,3 +336,57 @@
     animation: none;
   }
 }
+
+/* One-time explainer beside the Ask launcher. Sits in the dock's column flow
+   so it rides above the pill rather than overlapping it. */
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 320px;
+  padding: 9px 10px 9px 13px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--phosphor) 45%, var(--line-cyan-dim));
+  background: color-mix(in srgb, var(--ink-panel-raised) 92%, transparent);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--paper) 12%, transparent);
+  animation: hintIn 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hintText {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--paper);
+}
+
+.hintAside {
+  color: var(--text-muted);
+}
+
+.hintClose {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.hintClose:hover {
+  color: var(--amber);
+}
+
+@keyframes hintIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint { animation: none; }
+}

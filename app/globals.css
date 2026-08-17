@@ -42,10 +42,13 @@ body {
   color: var(--paper);
 }
 
-/* Match the density of viewing the sheet at 75% browser zoom. */
+/* Global display density. Was 0.75 (deliberately zoomed out to fit more of the
+   "sheet" on screen); now 1.5, so everything renders half again as large as
+   browser default. This is the single knob for overall scale — the layout is
+   built on clamp()/vw units, so changing it reflows rather than clips. */
 @media (min-width: 720px) {
   html {
-    zoom: 0.75;
+    zoom: 1.5;
   }
 }
 

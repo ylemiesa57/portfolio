@@ -368,6 +368,81 @@ export const projects: Project[] = [
   },
 ];
 
+// ---- Project write-ups -------------------------------------------------------
+// Fixed three-field write-up per project, shown on the expanded card.
+//
+// This replaces the earlier approach of parsing each repo's README at build
+// time. Live parsing sounded self-maintaining but produced uneven cards: these
+// READMEs share no heading vocabulary, several are thin enough that the panel
+// came out nearly empty, and it cost one GitHub API request per repo on every
+// build. A fixed shape reads better and is honest about what's actually known.
+//
+// `why` is deliberately optional. It's personal motivation, and for a couple of
+// repos nothing in the repo or the resume actually records it -- those are left
+// undefined rather than invented, and the card simply omits the section. Fill
+// them in here when you get a chance; the two known gaps are noted inline.
+
+export interface ProjectDetail {
+  /** Plain description of what the thing is. */
+  what: string;
+  /** Why it was built. Omitted where the real reason isn't on record. */
+  why?: string;
+  /** Tradeoffs made, limits accepted, and what came out of building it. */
+  learned: string;
+}
+
+export const projectDetails: Record<string, ProjectDetail> = {
+  boltless: {
+    what: "An embeddable property-graph and graph-RAG engine in pure standard-library Python, with no dependencies. Property store with CSR adjacency, a hand-rolled write-ahead log, an HNSW vector index, a Cypher subset, and hybrid vector + personalized-PageRank retrieval — every layer written from scratch.",
+    why: "This portfolio's own GraphRAG stack died when the free-tier Neo4j Aura instance behind it was auto-paused for inactivity and then deleted. The dependency I didn't control turned out to be the single point of failure, so I rewrote the whole layer at the scale RAG actually needs — thousands to millions of nodes, not billions.",
+    learned: "Sizing to the real workload is what makes 'build it yourself' tractable: at 10³–10⁶ nodes you can skip nearly everything a production graph database needs. HNSW recall is measured against a brute-force oracle rather than asserted, because an approximate index that silently degrades is worse than no index. The honest tradeoff is that zero dependencies means no C extensions, so it will never match faiss on raw throughput.",
+  },
+  "6.5931-Final-Project": {
+    what: "An analytical model of retrieval-augmented generation on an edge-class accelerator, built in AccelForge. The full RAG query path is expressed as Einsums and pushed through a four-tier memory hierarchy modelled on a Jetson Orin Nano: 8 GB LPDDR5, 8 MB on-chip SRAM, FP16 MACs.",
+    why: "Final project for 6.5931. RAG gets discussed as a software trick, but on a memory-constrained device it's really a memory-systems problem, and I wanted to find out whether the cost actually comes from the language model or from the retrieval.",
+    learned: "The measured answer was the opposite of my intuition. Retrieval never exceeds 0.7% of total energy, and a 16x larger corpus costs +0.7% while a 16x longer sequence costs ~16x. On-chip SRAM traffic is 94.4% of the budget against 1.0% for the MACs, and the token-embedding Einsum alone is 90.3%. It's memory-bound by a wide margin. The limit worth naming: the corpus sizes swept never outgrow DRAM, so the disk-streaming regime where that conclusion would break isn't reached.",
+  },
+  "fpga-autonomous-robot-car": {
+    what: "An end-to-end FPGA pipeline for real-time lane detection on a Spartan-7. Camera frames stream through a DDR3 frame buffer, then blur, threshold, ROI and perspective warp, then connected-component labeling and centroid math, then lane pairing, then an HDMI overlay drawn in hardware.",
+    // TODO(yaphet): no stated motivation in the repo. Was this a course project
+    // (6.205?), a personal build, a competition entry? One line here would fill
+    // the gap — I've left it out rather than guess.
+    learned: "The debugging is the interesting part, and it's kept as a running log in sim/KNOWN_ISSUES.md rather than a tidy summary — including the theories that turned out wrong. The ccl_8conn address-aliasing theory and the GEN_BITS wraparound theory were both empirically ruled out; the real cause of cc_valid_out never asserting for small blobs was a threshold mismatch in ccl_calc.sv, where the divider kick-off demanded a larger blob than the validity check did.",
+  },
+  "riscv-simd-core": {
+    what: "A minimal 5-stage RISC-V core in Bluespec (IF/ID/EX/MEM/WB) implementing an RV32I subset plus one custom SIMD instruction: a 4-lane integer dot product, vdot.vv. Paired with a small C instruction-set simulator and a Python test harness that assembles tiny programs and checks the results.",
+    // TODO(yaphet): the repo states a design goal ("clarity and traceable
+    // correctness, not peak performance") but never says why it was built.
+    // Course work, interview prep, curiosity? Worth one line.
+    learned: "Cross-checking RTL against an independent C model is what makes correctness traceable — two implementations disagreeing is a much louder signal than one implementation passing its own tests. The explicit tradeoff is stated up front in the repo: this optimises for being readable and verifiable rather than fast, so there's no attempt at aggressive forwarding or branch prediction.",
+  },
+  EmbraceAI: {
+    what: "A mental-health support system built around a fine-tuned intent classifier over 12 conversational categories, served through a FastAPI inference API, with a parallel Kafka + Spark path that warehouses classified conversation turns to S3 as partitioned Parquet.",
+    why: "Built for the AI CAMP NLP track hackathon, where it took first place / Top NLP Project.",
+    learned: "The streaming path isn't a replacement for the synchronous endpoint, it's a different job: durability and a queryable record, not lower latency. Batching classification through a pandas UDF loads the model once per executor instead of once per row, which is the difference between viable and unusable. Being straight about status matters too — the repo flags that the Kafka/Spark path has not been run end-to-end against a live broker, and that the checkpoint in spark_consumer.py is a placeholder.",
+  },
+  "ai-bom-analysis": {
+    what: "A toolkit for analysing AI/ML supply-chain bills of materials. It builds AI-BOM dependency graphs, runs weighted Monte Carlo risk simulations over CVEs, misconfigurations, weak controls, data quality and exploitability, and renders centrality analyses (betweenness, PageRank) as plots.",
+    why: "Software supply-chain risk has an established SBOM workflow; AI/ML systems have the same exposure through models, datasets and pipeline dependencies but not the same tooling. This takes the SBOM approach from my UROP node-exploitability work and swaps in an AI-specific graph generator and risk model.",
+    learned: "Weighting is the whole argument: the α-vector puts 30% each on data quality and exploitability versus 10% on raw CVE count, because a vulnerability that can't be reached matters less than a dataset you can't trust. Centrality is what makes the graph worth building — it finds the components whose compromise propagates furthest, which a flat dependency list can't show.",
+  },
+  "Distributed-Data-Analytics-Pipeline": {
+    what: "A real-time analytics pipeline that streams Reddit comments through Kafka, processes them in parallel with Spark, and warehouses the results in S3 for downstream analysis.",
+    why: "Built at HackMIT as a distributed-systems exercise: handle a live, unbounded stream without dropping data when a consumer falls over.",
+    learned: "Fault tolerance is a design choice made up front, not a feature added later — keying by session so a conversation's events stay ordered on one partition, and acks=all with retries so a message isn't silently lost, both have to be there from the start. The honest gap is that there's no UI: this is infrastructure, and it's judged on throughput and durability rather than on anything you can look at.",
+  },
+  "visionquest-misti": {
+    what: "A Python/NumPy/OpenCV curriculum — lessons, exercises and image-processing labs — built around Raspberry Pi hardware, with setup guides that start from nothing.",
+    why: "I built and taught it for MIT MISTI's AI Vision Quest program, for students starting with no Python and no computer-vision background.",
+    learned: "Teaching material fails on the setup step long before it fails on the concepts, so most of the effort went into the path from bare hardware to a first running script. Writing for genuine beginners forces you to name the assumptions you'd otherwise skip — which is a good test of whether you actually understand the material.",
+  },
+  portfolio: {
+    what: "This site. A Next.js portfolio that builds itself from the GitHub API at request time, with a GraphRAG assistant over a knowledge graph of my work, served by a Boltless backend.",
+    why: "Static portfolios go stale the moment you ship them. This one reads live from GitHub, so pushing code is what updates the site — and the Ask feature was an excuse to build retrieval over my own data rather than write about having done it.",
+    learned: "Building live off an external API means designing for its failure: an unauthenticated GitHub call is limited to 60 requests an hour per IP, shared serverless egress burns that fast, and the failure mode has to be an honest empty state rather than a broken-looking page. The retrieval side taught the sharper lesson — embedding queries and documents identically, and letting one-line boilerplate nodes into the vector index, both quietly wrecked answer quality until they were fixed.",
+  },
+};
+
 // ---- Project visuals ---------------------------------------------------------
 // The Projects section shows an image beside each project. Most of these repos
 // have nothing to photograph -- a Bluespec core or a Kafka pipeline has no UI --

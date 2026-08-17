@@ -1,19 +1,14 @@
-import {
-  classifyDomain,
-  getReadme,
-  getRepos,
-  getUser,
-} from "@/lib/github";
+import { classifyDomain, getRepos, getUser } from "@/lib/github";
 import {
   awards,
   initiatives,
   ossContributions,
+  projectDetails,
   projectLiveUrls,
   projectVisuals,
   publications,
   PINNED_REPOS,
 } from "@/lib/content";
-import { parseReadme } from "@/lib/readme";
 import TitleBar from "@/components/TitleBar";
 import Hero from "@/components/Hero";
 import Awards from "@/components/Awards";
@@ -23,6 +18,7 @@ import Initiatives from "@/components/Initiatives";
 import OSSContributions from "@/components/OSSContributions";
 import Footer from "@/components/Footer";
 import Reveal from "@/components/Reveal";
+import TraceBridge from "@/components/TraceBridge";
 import ScrollRail from "@/components/ScrollRail";
 import ScrollBall from "@/components/ScrollBall";
 import Navigator from "@/components/Navigator";
@@ -47,16 +43,12 @@ function formatPushed(iso: string): string {
 export default async function Home() {
   const [user, repos] = await Promise.all([getUser(), getRepos()]);
 
-  // README-derived copy for each project card. One request per repo, cached by
-  // Next's fetch cache at the same revalidate window as everything else.
-  const readmes = await Promise.all(repos.map((r) => getReadme(r.name)));
-
   const pinnedSet = new Set(PINNED_REPOS);
-  const entries: ProjectEntry[] = repos.map((repo, i) => ({
+  const entries: ProjectEntry[] = repos.map((repo) => ({
     repo,
     domain: classifyDomain(repo),
     pinned: pinnedSet.has(repo.name),
-    readme: parseReadme(readmes[i], repo),
+    detail: projectDetails[repo.name],
     visual: projectVisuals[repo.name],
     liveUrl: projectLiveUrls[repo.name],
     pushedLabel: formatPushed(repo.pushed_at),
@@ -82,6 +74,7 @@ export default async function Home() {
           photoSrc="/photo.jpg"
         />
       </Reveal>
+      <TraceBridge />
       <Reveal id="modules">
         <ProjectsSection entries={entries} />
       </Reveal>

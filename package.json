@@ -10,6 +10,7 @@
     "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {
+    "gsap": "^3.15.0",
     "motion": "^12.42.2",
     "next": "16.2.12",
     "react": "19.2.4",
