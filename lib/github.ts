@@ -54,9 +54,25 @@ async function safeFetch<T>(path: string): Promise<T | null> {
       headers: authHeaders(),
       next: { revalidate: REVALIDATE_SECONDS },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Log loudly rather than failing silently. The usual cause in
+      // production is a missing GITHUB_TOKEN: unauthenticated calls are
+      // limited to 60/hour *per IP*, and serverless egress IPs are shared,
+      // so that budget is often already spent by someone else. The symptom
+      // is a page that renders fine but with an empty Projects section,
+      // which is otherwise very hard to diagnose from the outside.
+      console.error(
+        `[github] GET ${path} failed: ${res.status} ${res.statusText}` +
+          (res.status === 403 || res.status === 429
+            ? ` (rate limited; remaining=${res.headers.get("x-ratelimit-remaining") ?? "?"}` +
+              `, authenticated=${process.env.GITHUB_TOKEN ? "yes" : "NO -- set GITHUB_TOKEN"})`
+            : "")
+      );
+      return null;
+    }
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    console.error(`[github] GET ${path} threw:`, err);
     return null;
   }
 }

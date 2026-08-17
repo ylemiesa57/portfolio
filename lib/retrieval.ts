@@ -43,7 +43,7 @@ export const retrieve: Retrieve = async (query, opts) => {
   const hops = Math.max(1, Math.min(3, Math.floor(opts?.hops ?? 1)));
 
   // 1. Embed the query.
-  const qvec = await embed(query);
+  const qvec = await embed(query, "RETRIEVAL_QUERY");
 
   // 2. Hybrid vector + graph retrieval, scored server-side by Boltless.
   const result = await boltlessRetrieve(qvec, { k, hops, topN: TOP_N });

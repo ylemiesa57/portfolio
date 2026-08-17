@@ -18,8 +18,19 @@ const GEMINI_URL =
   process.env.GEMINI_EMBED_URL ||
   `https://generativelanguage.googleapis.com/v1beta/models/${EMBED_MODEL}:embedContent`;
 
+/**
+ * Gemini's embedding model is asymmetric-retrieval aware: it expects the
+ * *query* side and the *document* side of a search to be embedded with
+ * different taskTypes. Omitting taskType (the previous behaviour) gets you a
+ * generic symmetric embedding, which measurably mis-ranks retrieval here --
+ * e.g. "What has he published?" scored the boilerplate "SYSTEMS -- a domain of
+ * Yaphet's work" node above the actual Paper nodes. Pass RETRIEVAL_DOCUMENT at
+ * ingest time and RETRIEVAL_QUERY at request time.
+ */
+export type EmbedTaskType = "RETRIEVAL_QUERY" | "RETRIEVAL_DOCUMENT";
+
 /** Embed a single string into a vector. */
-export async function embed(input: string): Promise<number[]> {
+export async function embed(input: string, taskType?: EmbedTaskType): Promise<number[]> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new LLMUnreachableError("GEMINI_API_KEY is not set.");
@@ -34,6 +45,7 @@ export async function embed(input: string): Promise<number[]> {
         model: `models/${EMBED_MODEL}`,
         content: { parts: [{ text: input }] },
         output_dimensionality: EMBED_DIM,
+        ...(taskType ? { taskType } : {}),
       }),
       signal: AbortSignal.timeout(30_000),
     });
@@ -51,8 +63,11 @@ export async function embed(input: string): Promise<number[]> {
 }
 
 /** Convenience for ingest: embed many strings sequentially (small corpus, keep it simple). */
-export async function embedMany(inputs: string[]): Promise<number[][]> {
+export async function embedMany(
+  inputs: string[],
+  taskType?: EmbedTaskType
+): Promise<number[][]> {
   const out: number[][] = [];
-  for (const s of inputs) out.push(await embed(s));
+  for (const s of inputs) out.push(await embed(s, taskType));
   return out;
 }

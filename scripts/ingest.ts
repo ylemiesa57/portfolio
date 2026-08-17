@@ -212,17 +212,50 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
 
 // ---- Run ---------------------------------------------------------------------
 
-type EmbeddedNode = GNode & { embedding: number[] };
+type EmbeddedNode = GNode & { embedding?: number[] };
+
+// Node types that carry real, distinguishing information and are worth using
+// as vector-search seeds. Domain/Language/Org nodes are deliberately excluded:
+// their text is one-line boilerplate ("SYSTEMS -- a domain of Yaphet's
+// engineering work"), which embeds close to the centre of the vector space and
+// therefore scores highly against almost *any* query. Left seedable, they
+// crowded genuinely relevant Experience/Paper/Repo nodes out of the top-k --
+// e.g. "What did Yaphet do at JPL?" returned SYSTEMS and Jupyter Notebook
+// above the actual JPL experience node.
+//
+// They're still added to the graph and still returned to the visualisation via
+// k-hop expansion from a seed; they just don't get an embedding, so Boltless's
+// HNSW index never seeds a search from them. build_snapshot.py already skips
+// set_embedding() for nodes without one.
+const SEEDABLE_TYPES = new Set<GNode["type"]>([
+  "Person",
+  "Education",
+  "Experience",
+  "Repo",
+  "Paper",
+  "Award",
+  "Initiative",
+]);
 
 async function main() {
   console.log("→ building nodes + edges from content");
   const { nodes, edges } = await buildNodesAndEdges();
   console.log(`  ${nodes.length} nodes, ${edges.length} edges`);
 
-  console.log("→ embedding nodes");
+  const seedable = nodes.filter((n) => SEEDABLE_TYPES.has(n.type));
+  console.log(
+    `→ embedding ${seedable.length} seedable nodes ` +
+      `(skipping ${nodes.length - seedable.length} Domain/Language/Org boilerplate nodes)`
+  );
   const embedded: EmbeddedNode[] = [];
   for (const node of nodes) {
-    const embedding = await embed(node.text);
+    if (!SEEDABLE_TYPES.has(node.type)) {
+      embedded.push({ ...node });
+      continue;
+    }
+    // RETRIEVAL_DOCUMENT is the document half of Gemini's asymmetric
+    // retrieval pair; lib/retrieval.ts embeds the query with RETRIEVAL_QUERY.
+    const embedding = await embed(node.text, "RETRIEVAL_DOCUMENT");
     embedded.push({ ...node, embedding });
     process.stdout.write(".");
   }
@@ -245,7 +278,10 @@ async function main() {
     throw new Error(`build_snapshot.py exited with status ${result.status}`);
   }
 
-  console.log(`✓ ingest complete: ${nodes.length} nodes, ${edges.length} edges`);
+  console.log(
+    `✓ ingest complete: ${nodes.length} nodes ` +
+      `(${embedded.filter((n) => n.embedding).length} embedded), ${edges.length} edges`
+  );
 }
 
 main().catch((err) => {
