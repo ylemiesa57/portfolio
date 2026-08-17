@@ -1,0 +1,79 @@
+<svg width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg" role="img" font-family="-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif">
+<title>Boltless in production: the portfolio integration</title>
+<desc>An offline ingest pipeline builds a Boltless graph snapshot from GitHub and static content. A Vercel deployment serves it as two services in one project: a public Next.js frontend and a private FastAPI backend wrapping Boltless, connected only by a private service binding with no public route to the graph engine.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/>
+</marker>
+<marker id="arrowTeal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#0F6E56"/>
+</marker>
+</defs>
+
+<text x="40" y="28" font-size="13" font-weight="500" fill="#2C2C2A">1. Ingest — offline, build-time</text>
+
+<rect x="40" y="40" width="135" height="60" rx="6" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1"/>
+<text x="107" y="63" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">GitHub API +</text>
+<text x="107" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">content.ts</text>
+<text x="107" y="93" text-anchor="middle" font-size="11" fill="#5F5E5A">source data</text>
+
+<line x1="175" y1="70" x2="193" y2="70" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="195" y="40" width="135" height="60" rx="6" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1"/>
+<text x="262" y="63" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ingest.ts</text>
+<text x="262" y="78" text-anchor="middle" font-size="11" fill="#534AB7">builds nodes/edges,</text>
+<text x="262" y="91" text-anchor="middle" font-size="11" fill="#534AB7">embeds via Gemini</text>
+
+<line x1="330" y1="70" x2="348" y2="70" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="350" y="40" width="135" height="60" rx="6" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+<text x="417" y="63" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">build_snapshot.py</text>
+<text x="417" y="78" text-anchor="middle" font-size="11" fill="#0F6E56">writes a Boltless</text>
+<text x="417" y="91" text-anchor="middle" font-size="11" fill="#0F6E56">GraphDB + HNSW</text>
+
+<line x1="485" y1="70" x2="503" y2="70" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="505" y="40" width="135" height="60" rx="6" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+<text x="572" y="63" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">snapshot.bolt</text>
+<text x="572" y="78" text-anchor="middle" font-size="11" fill="#0F6E56">committed to git —</text>
+<text x="572" y="91" text-anchor="middle" font-size="11" fill="#0F6E56">no live writes</text>
+
+<text x="40" y="135" font-size="13" font-weight="500" fill="#2C2C2A">2. Serve — one Vercel project, two services</text>
+
+<rect x="195" y="152" width="445" height="150" rx="8" fill="none" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="207" y="169" font-size="11" fill="#5F5E5A">Vercel project</text>
+
+<line x1="572" y1="100" x2="550" y2="193" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="3 3" marker-end="url(#arrowTeal)"/>
+<text x="600" y="122" text-anchor="middle" font-size="11" fill="#0F6E56">bundled into</text>
+<text x="600" y="136" text-anchor="middle" font-size="11" fill="#0F6E56">the deploy</text>
+
+<rect x="40" y="200" width="120" height="50" rx="6" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1"/>
+<text x="100" y="221" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">Visitors</text>
+<text x="100" y="236" text-anchor="middle" font-size="11" fill="#5F5E5A">public internet</text>
+
+<line x1="160" y1="225" x2="213" y2="225" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="215" y="195" width="180" height="70" rx="6" fill="#EEEDFE" stroke="#7F77DD" stroke-width="1"/>
+<text x="305" y="218" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">web — Next.js</text>
+<text x="305" y="234" text-anchor="middle" font-size="11" fill="#534AB7">/api/ask, lib/retrieval.ts</text>
+<text x="305" y="248" text-anchor="middle" font-size="11" fill="#534AB7">the only public route</text>
+
+<line x1="395" y1="225" x2="458" y2="225" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="460" y="195" width="175" height="70" rx="6" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+<text x="547" y="218" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">graph — FastAPI</text>
+<text x="547" y="234" text-anchor="middle" font-size="11" fill="#0F6E56">Boltless Retriever</text>
+<text x="547" y="248" text-anchor="middle" font-size="11" fill="#0F6E56">no public route at all</text>
+
+<text x="426" y="286" text-anchor="middle" font-size="11" fill="#5F5E5A">private binding · BOLTLESS_URL injected by Vercel, never a public URL</text>
+
+<rect x="40" y="318" width="14" height="10" rx="2" fill="#EEEDFE" stroke="#7F77DD"/>
+<text x="60" y="327" font-size="11" fill="#444441">TypeScript / Next.js</text>
+<rect x="200" y="318" width="14" height="10" rx="2" fill="#E1F5EE" stroke="#1D9E75"/>
+<text x="220" y="327" font-size="11" fill="#444441">Python / Boltless</text>
+<rect x="345" y="318" width="14" height="10" rx="2" fill="#F1EFE8" stroke="#B4B2A9"/>
+<text x="365" y="327" font-size="11" fill="#444441">external / data</text>
+
+<text x="40" y="356" font-size="11" fill="#5F5E5A">The graph is a build-time artifact, not a live database: nothing writes to it at request time,</text>
+<text x="40" y="371" font-size="11" fill="#5F5E5A">so there's no server that can idle out and get deleted — the failure mode that started this project.</text>
+</svg>

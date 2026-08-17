@@ -1,16 +1,24 @@
 import {
   classifyDomain,
-  DOMAIN_LABEL,
-  Domain,
+  getReadme,
   getRepos,
   getUser,
 } from "@/lib/github";
-import { awards, initiatives, ossContributions, publications } from "@/lib/content";
+import {
+  awards,
+  initiatives,
+  ossContributions,
+  projectLiveUrls,
+  projectVisuals,
+  publications,
+  PINNED_REPOS,
+} from "@/lib/content";
+import { parseReadme } from "@/lib/readme";
 import TitleBar from "@/components/TitleBar";
 import Hero from "@/components/Hero";
 import Awards from "@/components/Awards";
 import Publications from "@/components/Publications";
-import RepoGrid from "@/components/RepoGrid";
+import ProjectsSection, { type ProjectEntry } from "@/components/ProjectsSection";
 import Initiatives from "@/components/Initiatives";
 import OSSContributions from "@/components/OSSContributions";
 import Footer from "@/components/Footer";
@@ -26,28 +34,36 @@ const FALLBACK_URL = "https://github.com/ylemiesa57";
 const LINKEDIN_URL = "https://www.linkedin.com/in/yaphet-lemiesa-606603287/";
 const CONTACT_EMAIL = "yaphkl75@mit.edu";
 
+/** Rendered server-side so the string is identical at hydration. */
+function formatPushed(iso: string): string {
+  const d = new Date(iso);
+  const days = Math.floor((Date.now() - d.getTime()) / 86_400_000);
+  if (days < 1) return "pushed today";
+  if (days === 1) return "pushed yesterday";
+  if (days < 30) return `pushed ${days}d ago`;
+  return `pushed ${d.toLocaleDateString("en-US", { month: "short", year: "numeric" })}`;
+}
+
 export default async function Home() {
   const [user, repos] = await Promise.all([getUser(), getRepos()]);
 
-  const domainCounts = repos.reduce<Record<Domain, number>>(
-    (acc, repo) => {
-      const domain = classifyDomain(repo);
-      acc[domain] = (acc[domain] ?? 0) + 1;
-      return acc;
-    },
-    { hardware: 0, ai_ml: 0, systems: 0, data: 0 }
-  );
+  // README-derived copy for each project card. One request per repo, cached by
+  // Next's fetch cache at the same revalidate window as everything else.
+  const readmes = await Promise.all(repos.map((r) => getReadme(r.name)));
 
-  const domains = (
-    Object.entries(domainCounts) as [Domain, number][]
-  )
-    .filter(([, count]) => count > 0)
-    .sort((a, b) => b[1] - a[1])
-    .map(([domain, count]) => ({ label: DOMAIN_LABEL[domain], count }));
+  const pinnedSet = new Set(PINNED_REPOS);
+  const entries: ProjectEntry[] = repos.map((repo, i) => ({
+    repo,
+    domain: classifyDomain(repo),
+    pinned: pinnedSet.has(repo.name),
+    readme: parseReadme(readmes[i], repo),
+    visual: projectVisuals[repo.name],
+    liveUrl: projectLiveUrls[repo.name],
+    pushedLabel: formatPushed(repo.pushed_at),
+  }));
 
-  const languageCount = new Set(
-    repos.map((r) => r.language).filter((l): l is string => Boolean(l))
-  ).size;
+  // Pinned first, then the rest in the order getRepos() ranked them.
+  entries.sort((a, b) => Number(b.pinned) - Number(a.pinned));
 
   const rev = new Date().toISOString().slice(0, 10).replace(/-/g, ".");
 
@@ -60,20 +76,20 @@ export default async function Home() {
         <Hero
           name={user?.name ?? FALLBACK_NAME}
           tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
-          repoCount={user?.public_repos ?? repos.length}
-          languageCount={languageCount}
-          domains={domains}
+          projectCount={repos.length}
+          publicationCount={publications.length}
+          ossCount={ossContributions.length}
           photoSrc="/photo.jpg"
         />
+      </Reveal>
+      <Reveal id="modules">
+        <ProjectsSection entries={entries} />
       </Reveal>
       <Reveal id="awards">
         <Awards items={awards} />
       </Reveal>
       <Reveal id="publications">
         <Publications items={publications} />
-      </Reveal>
-      <Reveal id="modules">
-        <RepoGrid repos={repos} />
       </Reveal>
       <Reveal id="oss">
         <OSSContributions items={ossContributions} />

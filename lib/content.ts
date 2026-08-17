@@ -368,6 +368,37 @@ export const projects: Project[] = [
   },
 ];
 
+// ---- Project visuals ---------------------------------------------------------
+// The Projects section shows an image beside each project. Most of these repos
+// have nothing to photograph -- a Bluespec core or a Kafka pipeline has no UI --
+// and a screenshot of a rendered README is unreadable at card size (16px body
+// text lands at roughly 5px once scaled into a card). So this map is only for
+// projects with a *genuine* visual:
+//
+//   - a live deployed frontend, captured from the running site, or
+//   - a real artifact the repo itself produces (a generated plot, a diagram).
+//
+// Everything not listed here falls back to <ProjectMark>, the generative
+// per-repo mark already used on the cards. That keeps the grid on-brand instead
+// of padding it with grey screenshots of text.
+
+export const projectVisuals: Record<string, string> = {
+  portfolio: "/projects/portfolio.jpg",
+  Kindred_Items: "/projects/Kindred_Items.jpg",
+  "RAG-AI-OS": "/projects/RAG-AI-OS.jpg",
+  "emma-gf-day": "/projects/emma-gf-day.jpg",
+  "ai-bom-analysis": "/projects/ai-bom-analysis.jpg",
+  boltless: "/projects/boltless.svg",
+};
+
+// Live URLs, shown as a "visit" link on the expanded card.
+export const projectLiveUrls: Record<string, string> = {
+  portfolio: "https://yaphetlemiesa.vercel.app",
+  Kindred_Items: "https://conversational-object-twins.vercel.app",
+  "RAG-AI-OS": "https://ylemiesa57.github.io/RAG-AI-OS/",
+  "emma-gf-day": "https://emma-gf-day.vercel.app",
+};
+
 export const PINNED_REPOS: string[] = ["EmbraceAI", "ai-bom-analysis", "Distributed-Data-Analytics-Pipeline", "6.5931-Final-Project", "visionquest-misti"];
 
 export interface OSSContribution {

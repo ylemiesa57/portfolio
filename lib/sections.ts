@@ -20,6 +20,12 @@ export const SECTIONS: SectionSpec[] = [
       "the intro, who Yaphet is, his tagline and summary, overview stats, top of the page, start over, home, education, MIT, degree, coursework, work experience, internships, Bloomberg, Jet Propulsion Laboratory, NASA, JPL, Zenyai, CAMS, MIT Sloan, technical skills, what languages or tools he knows",
   },
   {
+    id: "modules",
+    label: "Projects",
+    keywords:
+      "projects, repositories, GitHub repos, code, the things he has built, hardware, AI/ML, systems, data projects, portfolio work",
+  },
+  {
     id: "awards",
     label: "Honors",
     keywords:
@@ -30,12 +36,6 @@ export const SECTIONS: SectionSpec[] = [
     label: "Publications",
     keywords:
       "research papers, publications, academic work, Google Scholar, cyber risk, ICS, papers he has written or co-authored",
-  },
-  {
-    id: "modules",
-    label: "Projects",
-    keywords:
-      "projects, repositories, GitHub repos, code, the things he has built, hardware, AI/ML, systems, data projects, portfolio work",
   },
   {
     id: "oss",
