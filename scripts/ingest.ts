@@ -19,10 +19,12 @@
 import { getRepos, classifyDomain, DOMAIN_LABEL } from "../lib/github";
 import {
   awards,
+  contactChannels,
   education,
   experience,
   initiatives,
   ossContributions,
+  projectDetails,
   projects,
   publications,
   skills,
@@ -231,6 +233,36 @@ async function buildNodesAndEdges(): Promise<{ nodes: GNode[]; edges: GEdge[] }>
     }
   }
 
+  // Contact channels → so "how do I reach him" is answerable from the graph
+  // rather than only readable in the footer.
+  for (const channel of contactChannels) {
+    const id = `contact:${channel.slug}`;
+    add({
+      id,
+      type: "Contact",
+      label: channel.label,
+      sectionId: "contact",
+      text: `Contact Yaphet Lemiesa by ${channel.label}: ${channel.value}. Link: ${channel.url}. This is the way to get in touch with him via ${channel.label}.`,
+      url: channel.url,
+    });
+    link(PERSON_ID, "REACHABLE_AT", id);
+  }
+
+  // Repo write-ups → fold the site's what/why/learned copy into the matching
+  // Repo node's text. These are the most specific descriptions of each project
+  // that exist anywhere, so without them the graph only knows a repo by its
+  // one-line GitHub description and can't answer "why did he build X" or
+  // "what were the tradeoffs".
+  for (const [repoName, detail] of Object.entries(projectDetails)) {
+    const repoId = `repo:${repoName}`;
+    const node = nodeMap.get(repoId);
+    if (!node) continue;
+    const parts = [node.text, `What it is: ${detail.what}`];
+    if (detail.why) parts.push(`Why he built it: ${detail.why}`);
+    parts.push(`Tradeoffs and what he learned: ${detail.learned}`);
+    node.text = parts.join(" ");
+  }
+
   // Skills → one node per group, not per skill (see lib/content.ts for why).
   for (const group of skills) {
     const id = `skillgroup:${group.slug}`;
@@ -274,6 +306,7 @@ const SEEDABLE_TYPES = new Set<GNode["type"]>([
   "Initiative",
   "Project",
   "SkillGroup",
+  "Contact",
 ]);
 
 async function main() {

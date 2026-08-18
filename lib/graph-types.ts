@@ -16,7 +16,8 @@ export type GNodeType =
   | "Experience"
   | "Education"
   | "Project"
-  | "SkillGroup";
+  | "SkillGroup"
+  | "Contact";
 
 export interface GNode {
   /** Stable unique id, e.g. "repo:EmbraceAI", "paper:ai-small-noisy-data". */

@@ -368,6 +368,50 @@ export const projects: Project[] = [
   },
 ];
 
+// ---- Contact ----------------------------------------------------------------
+// Consumed by scripts/ingest.ts so the Ask assistant can answer "how do I get
+// in touch" without the visitor having to scroll to the footer.
+//
+// Only channels already published on this page are listed. The phone number in
+// the resume bank is deliberately excluded: the footer doesn't show it, and
+// this graph answers anonymous public queries, so putting a personal mobile
+// behind a chat box is a different exposure than putting it on a PDF you hand
+// to a recruiter. Add it here if you'd rather it were answerable.
+
+export interface ContactChannel {
+  slug: string;
+  label: string;
+  value: string;
+  url: string;
+}
+
+export const contactChannels: ContactChannel[] = [
+  {
+    slug: "email",
+    label: "Email",
+    value: "yaphkl75@mit.edu",
+    url: "mailto:yaphkl75@mit.edu",
+  },
+  {
+    slug: "linkedin",
+    label: "LinkedIn",
+    value: "linkedin.com/in/yaphet-lemiesa",
+    url: "https://www.linkedin.com/in/yaphet-lemiesa-606603287/",
+  },
+  {
+    slug: "github",
+    label: "GitHub",
+    value: "github.com/ylemiesa57",
+    url: "https://github.com/ylemiesa57",
+  },
+  {
+    slug: "scholar",
+    label: "Google Scholar",
+    value: "Publications and citations",
+    url: SCHOLAR_URL,
+  },
+];
+
 // ---- Project write-ups -------------------------------------------------------
 // Fixed three-field write-up per project, shown on the expanded card.
 //
@@ -458,11 +502,17 @@ export const projectDetails: Record<string, ProjectDetail> = {
 // of padding it with grey screenshots of text.
 
 export const projectVisuals: Record<string, string> = {
+  // Captures of a running UI.
   portfolio: "/projects/portfolio.jpg",
   Kindred_Items: "/projects/Kindred_Items.jpg",
   "RAG-AI-OS": "/projects/RAG-AI-OS.jpg",
   "emma-gf-day": "/projects/emma-gf-day.jpg",
+  EmbraceAI: "/projects/EmbraceAI.jpg",
+  "cbc-hackathon": "/projects/cbc-hackathon.jpg",
+  fundamentals_analysis: "/projects/fundamentals_analysis.jpg",
+  // Real artifacts the project itself produces.
   "ai-bom-analysis": "/projects/ai-bom-analysis.jpg",
+  "6.5931-Final-Project": "/projects/6.5931-Final-Project.jpg",
   boltless: "/projects/boltless.svg",
 };
 
@@ -474,7 +524,22 @@ export const projectLiveUrls: Record<string, string> = {
   "emma-gf-day": "https://emma-gf-day.vercel.app",
 };
 
-export const PINNED_REPOS: string[] = ["EmbraceAI", "ai-bom-analysis", "Distributed-Data-Analytics-Pipeline", "6.5931-Final-Project", "visionquest-misti"];
+// Pinned = every project that has a genuine visual (see projectVisuals above),
+// so the top of the grid is the part of the page that actually shows something.
+// Kept in the same order as projectVisuals: running UIs first, then projects
+// whose own output is the artifact.
+export const PINNED_REPOS: string[] = [
+  "portfolio",
+  "Kindred_Items",
+  "RAG-AI-OS",
+  "emma-gf-day",
+  "EmbraceAI",
+  "cbc-hackathon",
+  "fundamentals_analysis",
+  "ai-bom-analysis",
+  "6.5931-Final-Project",
+  "boltless",
+];
 
 export interface OSSContribution {
   repo: string;
