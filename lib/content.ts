@@ -504,7 +504,6 @@ export const projectVisuals: Record<string, string> = {
   portfolio: "/projects/portfolio.jpg",
   Kindred_Items: "/projects/Kindred_Items.jpg",
   "RAG-AI-OS": "/projects/RAG-AI-OS.jpg",
-  "emma-gf-day": "/projects/emma-gf-day.jpg",
   EmbraceAI: "/projects/EmbraceAI.jpg",
   "cbc-hackathon": "/projects/cbc-hackathon.jpg",
   fundamentals_analysis: "/projects/fundamentals_analysis.jpg",
@@ -519,7 +518,6 @@ export const projectLiveUrls: Record<string, string> = {
   portfolio: "https://yaphetlemiesa.vercel.app",
   Kindred_Items: "https://conversational-object-twins.vercel.app",
   "RAG-AI-OS": "https://ylemiesa57.github.io/RAG-AI-OS/",
-  "emma-gf-day": "https://emma-gf-day.vercel.app",
 };
 
 // Pinned = every project that has a genuine visual (see projectVisuals above),
