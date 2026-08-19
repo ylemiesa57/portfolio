@@ -448,9 +448,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
   },
   "fpga-autonomous-robot-car": {
     what: "An end-to-end FPGA pipeline for real-time lane detection on a Spartan-7. Camera frames stream through a DDR3 frame buffer, then blur, threshold, ROI and perspective warp, then connected-component labeling and centroid math, then lane pairing, then an HDMI overlay drawn in hardware.",
-    // TODO(yaphet): no stated motivation in the repo. Was this a course project
-    // (6.205?), a personal build, a competition entry? One line here would fill
-    // the gap — I've left it out rather than guess.
+    why: "Final project for 6.205, MIT's digital systems lab — the course where you build something real on an FPGA rather than simulate it. Lane following was the target because it forces the whole chain to hold frame rate in hardware: capture, filter, label, pair and draw, with no processor in the loop to paper over a slow stage.",
     learned: "The debugging is the interesting part, and it's kept as a running log in sim/KNOWN_ISSUES.md rather than a tidy summary — including the theories that turned out wrong. The ccl_8conn address-aliasing theory and the GEN_BITS wraparound theory were both empirically ruled out; the real cause of cc_valid_out never asserting for small blobs was a threshold mismatch in ccl_calc.sv, where the divider kick-off demanded a larger blob than the validity check did.",
   },
   "riscv-simd-core": {
@@ -532,7 +530,6 @@ export const PINNED_REPOS: string[] = [
   "portfolio",
   "Kindred_Items",
   "RAG-AI-OS",
-  "emma-gf-day",
   "EmbraceAI",
   "cbc-hackathon",
   "fundamentals_analysis",
