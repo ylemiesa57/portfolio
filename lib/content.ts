@@ -568,6 +568,12 @@ export const ossContributions: OSSContribution[] = [
     url: "https://github.com/getmoto/moto/pull/10182",
   },
   {
+    repo: "spulec/freezegun",
+    description:
+      "Fixed a bug where freeze_time never faked time.mktime(), so it silently returned the real system time while every other time function stayed frozen. Added a fake_mktime() implementation and a regression test. PR open, pending maintainer review.",
+    url: "https://github.com/spulec/freezegun/pull/607",
+  },
+  {
     repo: "f4pga/prjxray",
     description:
       "Fixed a verbose-logging bug in the fuzzer's maketodo script where diagnostic output was mixed into stdout, corrupting the todo-list data file consumed downstream in the build. Routed diagnostics to stderr. PR open, pending maintainer review.",
