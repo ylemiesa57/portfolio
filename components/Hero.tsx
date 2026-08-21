@@ -23,10 +23,10 @@ export default function Hero({
         <div className={styles.copy}>
           <IntroLine />
           <h1 className={styles.name}>{name}</h1>
-          <p className={styles.tagline}>{tagline}</p>
+          <p className={styles.tagline}></p>
 
           <p className={styles.note}>
-            MIT and NASA work stays private — ask, and I&apos;ll walk you through it.
+            MIT, NASA, & Bloomberg work stays private... Ask and I will walk you through it! :)
           </p>
 
           {/* Counts that mean something to a reader. The previous trio
