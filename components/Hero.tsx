@@ -4,14 +4,12 @@ import styles from "./Hero.module.css";
 
 export default function Hero({
   name,
-  tagline,
   projectCount,
   publicationCount,
   ossCount,
   photoSrc,
 }: {
   name: string;
-  tagline: string;
   projectCount: number;
   publicationCount: number;
   ossCount: number;

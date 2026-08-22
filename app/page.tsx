@@ -24,7 +24,6 @@ import ScrollBall from "@/components/ScrollBall";
 import Navigator from "@/components/Navigator";
 
 const FALLBACK_NAME = "Yaphet Lemiesa";
-const FALLBACK_BIO = "Student interested in software, hardware, AI, and robotics.";
 const FALLBACK_URL = "https://github.com/ylemiesa57";
 
 const LINKEDIN_URL = "https://www.linkedin.com/in/yaphet-lemiesa-606603287/";
@@ -67,7 +66,6 @@ export default async function Home() {
       <Reveal id="hero">
         <Hero
           name={user?.name ?? FALLBACK_NAME}
-          tagline={user?.bio?.split("\n")[0] || FALLBACK_BIO}
           projectCount={repos.length}
           publicationCount={publications.length}
           ossCount={ossContributions.length}
