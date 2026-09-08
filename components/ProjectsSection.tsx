@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { DOMAIN_LABEL, Domain, GithubRepo } from "@/lib/github";
@@ -23,6 +23,36 @@ export interface ProjectEntry {
 
 /** Rows shown before the fade/blur cutoff. */
 const VISIBLE_ROWS = 2;
+
+/** Below this many cards, skip the clip/fade/"see all" machinery entirely --
+ *  a filtered tag (e.g. "Data") can leave only a handful of cards, and a
+ *  short grid doesn't need a collapse affordance for rows it never fills. */
+const COLLAPSE_THRESHOLD = 6;
+
+/** A filter chip. "featured" and "all" sit outside the Domain union, so the
+ *  filter bar can offer "just the highlights" and "everything" alongside the
+ *  four real domain buckets. */
+type FilterTag = "featured" | Domain | "all";
+
+const FILTER_ORDER: FilterTag[] = ["featured", "ai_ml", "hardware", "systems", "data", "all"];
+
+/** Short chip labels. Domain cards elsewhere use DOMAIN_LABEL's fuller,
+ *  uppercase form ("AI / ML"); the filter bar wants something a click target
+ *  can hold without wrapping. */
+const FILTER_LABEL: Record<FilterTag, string> = {
+  featured: "Featured",
+  ai_ml: "AI",
+  hardware: "Hardware",
+  systems: "Systems",
+  data: "Data",
+  all: "All",
+};
+
+function matchesFilter(entry: ProjectEntry, tag: FilterTag): boolean {
+  if (tag === "featured") return entry.pinned;
+  if (tag === "all") return true;
+  return entry.domain === tag;
+}
 
 /** Cycled in the vacated card slot while a project is open. */
 const SLOT_EMOJI = ["🔧", "⚙️", "📐", "🛠️", "🧪", "📎", "🔬", "✏️"];
@@ -72,8 +102,36 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
   const reduce = useReducedMotion();
   const [expanded, setExpanded] = useState(false);
   const [openId, setOpenId] = useState<number | null>(null);
+  // Featured-first by default so the grid opens on the projects worth a
+  // glance, not a wall of every repo. Falls back to "all" if nothing is
+  // pinned, since a "Featured" tab that always shows zero results is worse
+  // than not defaulting to it.
+  const [activeTag, setActiveTag] = useState<FilterTag>(() =>
+    entries.some((e) => e.pinned) ? "featured" : "all"
+  );
   const panelRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
+
+  // Only offer a chip if it would actually show something -- an empty
+  // "Data" tag that always renders zero cards is just a dead click.
+  const availableTags = useMemo(
+    () => FILTER_ORDER.filter((tag) => tag === "all" || entries.some((e) => matchesFilter(e, tag))),
+    [entries]
+  );
+
+  const filteredEntries = useMemo(
+    () => entries.filter((e) => matchesFilter(e, activeTag)),
+    [entries, activeTag]
+  );
+
+  const canCollapse = filteredEntries.length > COLLAPSE_THRESHOLD;
+
+  const selectTag = useCallback((tag: FilterTag) => {
+    setActiveTag(tag);
+    // A new filter is a new list -- start it collapsed rather than carrying
+    // over however far the previous filter had been expanded.
+    setExpanded(false);
+  }, []);
 
   const open = entries.find((e) => e.repo.id === openId) ?? null;
 
@@ -98,12 +156,29 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
           <p className={styles.kicker}>selected</p>
           <h2 className={styles.title}>Projects</h2>
         </div>
-        <span className={styles.count}>{entries.length} loaded</span>
+        <span className={styles.count}>
+          {activeTag === "all" ? `${entries.length} loaded` : `${filteredEntries.length} of ${entries.length}`}
+        </span>
       </div>
       <p className={styles.sub}>
         Pulled live from GitHub. Click any project for what it is, why I built
         it, and what the tradeoffs taught me.
       </p>
+
+      <div className={styles.filterBar} role="group" aria-label="Filter projects by category">
+        {availableTags.map((tag) => (
+          <button
+            key={tag}
+            type="button"
+            className={styles.filterTag}
+            aria-pressed={activeTag === tag}
+            data-active={activeTag === tag || undefined}
+            onClick={() => selectTag(tag)}
+          >
+            {FILTER_LABEL[tag]}
+          </button>
+        ))}
+      </div>
 
       <AnimatePresence mode="wait">
         {open && (
@@ -186,11 +261,11 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
       </AnimatePresence>
 
       <div
-        className={`${styles.gridWrap} ${expanded ? styles.gridOpen : styles.gridClipped}`}
+        className={`${styles.gridWrap} ${!canCollapse || expanded ? styles.gridOpen : styles.gridClipped}`}
         style={{ "--visible-rows": VISIBLE_ROWS } as React.CSSProperties}
       >
         <div className={styles.grid}>
-          {entries.map((entry) => {
+          {filteredEntries.map((entry) => {
             const isOpen = entry.repo.id === openId;
             if (isOpen) {
               // The card itself has warped up into the panel above, so this
@@ -227,17 +302,17 @@ export default function ProjectsSection({ entries }: { entries: ProjectEntry[] }
             );
           })}
         </div>
-        {!expanded && <div className={styles.fade} aria-hidden="true" />}
+        {canCollapse && !expanded && <div className={styles.fade} aria-hidden="true" />}
       </div>
 
-      {!expanded && (
+      {canCollapse && !expanded && (
         <div className={styles.moreRow}>
           <button type="button" className={styles.moreBtn} onClick={() => setExpanded(true)}>
-            See all {entries.length} projects
+            See all {filteredEntries.length} projects
           </button>
         </div>
       )}
-      {expanded && (
+      {canCollapse && expanded && (
         <div className={styles.moreRow}>
           <button
             type="button"

@@ -43,6 +43,41 @@
   line-height: 1.6;
 }
 
+/* ---- filter bar ------------------------------------------------------------ */
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.filterTag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 7px 15px;
+  border: 1px solid var(--line-cyan-dim);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.filterTag:hover,
+.filterTag:focus-visible {
+  border-color: var(--phosphor);
+  color: var(--phosphor);
+}
+
+.filterTag[data-active] {
+  border-color: var(--phosphor);
+  color: var(--ink-deep);
+  background: var(--phosphor);
+}
+
 /* ---- grid + clipping ------------------------------------------------------ */
 
 .gridWrap {
