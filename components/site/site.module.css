@@ -1,0 +1,891 @@
+/* One screen, no scrolling: a bar, the view, and the Ask field. */
+
+.shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100svh;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---- Bar ------------------------------------------------------------------ */
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 32px;
+  padding-block: 22px 18px;
+  border-bottom: 1px solid var(--rule);
+  animation: settle 0.9s var(--ease) both;
+}
+
+.home {
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 26px;
+}
+
+.navLink {
+  padding-block: 4px;
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  color: var(--soft);
+  text-decoration: none;
+  transition: color 0.2s ease-out;
+}
+
+.navLink:hover {
+  color: var(--ink);
+}
+
+.navLink[aria-current] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.45em;
+}
+
+/* ---- Stage ---------------------------------------------------------------- */
+
+.stage {
+  display: grid;
+  /* Every view starts at the same height, so switching doesn't jump. */
+  align-content: start;
+  min-height: 0;
+  padding-block: clamp(24px, 8vh, 88px) clamp(16px, 3vh, 32px);
+  /* Every view is written to fit. If a screen is too small even for that,
+     the view scrolls here, with a bar that shows it does. */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+}
+
+/* The first page sits in the middle of the screen. */
+.stage[data-view="about"] {
+  align-content: center;
+  padding-block: clamp(16px, 3vh, 32px);
+}
+
+.viewTitle,
+.groupTitle {
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+/* ---- The reveal: a part of a word at a time -------------------------------- */
+
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+/* The whole string, once, for assistive tech; never selected, so copying
+   the visible text doesn't pick it up twice. */
+.spoken {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.part {
+  display: inline-block;
+  animation: arrive 0.55s var(--ease) both;
+  animation-delay: var(--d, 0ms);
+}
+
+.rise {
+  animation: settle 0.7s var(--ease) both;
+}
+
+/* After the first arrival the same sequence plays quickly: moving between
+   views shouldn't cost a wait. The Ask answer keeps the unhurried pace. */
+.shell[data-later] .part {
+  animation-duration: 0.4s;
+  animation-delay: calc(var(--d, 0ms) * 0.28);
+}
+
+.shell[data-later] [data-full] .part {
+  animation-duration: 0.55s;
+  animation-delay: var(--d, 0ms);
+}
+
+.shell[data-later] .rise {
+  animation-duration: 0.45s;
+  animation-delay: 90ms !important;
+}
+
+.shell[data-later] [data-view="ask"] .rise {
+  animation-delay: 500ms !important;
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(0.14em);
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---- About ---------------------------------------------------------------- */
+
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  /* The portrait stands on the same line as the last row of text. */
+  align-items: end;
+  gap: 32px clamp(32px, 7vw, 112px);
+}
+
+.name {
+  font-size: clamp(2.75rem, 7vw, 5.25rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.022em;
+}
+
+.statement {
+  max-width: 30em;
+  margin-top: clamp(18px, 3vh, 30px);
+  font-size: clamp(1.1875rem, 1.9vw, 1.5rem);
+  line-height: 1.4;
+}
+
+.facts {
+  display: grid;
+  gap: 6px;
+  margin-top: clamp(20px, 3.4vh, 34px);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  line-height: 1.45;
+}
+
+.facts > div {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 12px;
+}
+
+.facts dt {
+  color: var(--soft);
+}
+
+.facts dd span {
+  display: block;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 24px;
+  margin-top: clamp(18px, 3vh, 28px);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+}
+
+.link {
+  /* Ink even inside grey small print, so a link never reads as plain text. */
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.28em;
+  transition: text-decoration-color 0.2s ease-out;
+}
+
+.link:hover {
+  text-decoration-color: currentColor;
+}
+
+.portrait {
+  width: clamp(120px, 14vw, 176px);
+}
+
+.portrait img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+/* ---- List and entry -------------------------------------------------------- */
+
+.browser {
+  display: grid;
+  grid-template-columns: minmax(0, 23rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px clamp(32px, 7vw, 104px);
+}
+
+.intro {
+  margin-bottom: 22px;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+}
+
+.group + .group {
+  margin-top: 22px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--soft);
+  transition: color 0.2s ease-out;
+}
+
+.row:hover,
+.row[aria-current] {
+  color: var(--ink);
+}
+
+.row[aria-current] .rowName {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.32em;
+}
+
+.rowName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rowAside {
+  flex: none;
+  font-size: 0.8125rem;
+  color: var(--soft);
+}
+
+.entry {
+  max-width: 38rem;
+}
+
+.entryName {
+  font-size: clamp(1.625rem, 3vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.012em;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin-top: 6px;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--soft);
+}
+
+.prose {
+  margin-top: 14px;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+.outro {
+  margin-top: 20px;
+}
+
+.moreSources {
+  display: none;
+}
+
+.pager {
+  display: flex;
+  align-items: baseline;
+  margin-top: 14px;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--soft);
+}
+
+.back {
+  display: none;
+  margin-bottom: 18px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--soft);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.28em;
+}
+
+/* ---- Publications ---------------------------------------------------------- */
+
+.papers {
+  max-width: 44rem;
+}
+
+.pubs {
+  display: grid;
+  gap: 22px;
+}
+
+.pubTitle {
+  font-size: clamp(1.125rem, 1.7vw, 1.375rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pubs .meta {
+  margin-top: 3px;
+}
+
+/* ---- Answer ----------------------------------------------------------------- */
+
+.answer {
+  max-width: 42rem;
+}
+
+.question {
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  color: var(--soft);
+}
+
+.reply {
+  margin-top: 14px;
+  font-size: clamp(1.1875rem, 1.9vw, 1.4375rem);
+  line-height: 1.45;
+}
+
+.citations {
+  margin-top: 22px;
+  border-top: 1px solid var(--rule);
+}
+
+.citation {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 9px 0;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: none;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  transition: color 0.2s ease-out;
+}
+
+.citation:hover {
+  color: var(--accent);
+}
+
+.quiet {
+  margin-left: 12px;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
+  text-underline-offset: 0.28em;
+}
+
+.meta > .quiet:first-child {
+  margin-left: 0;
+}
+
+.quiet:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---- Ask field --------------------------------------------------------------- */
+
+.ask {
+  padding-block: 14px 18px;
+  border-top: 1px solid var(--rule);
+  animation: settle 0.9s var(--ease) 0.3s both;
+}
+
+.askForm {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.askInput {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 1.125rem;
+  color: var(--ink);
+}
+
+.askInput::placeholder {
+  color: var(--soft);
+  opacity: 1;
+}
+
+.askInput:focus-visible {
+  outline: none;
+}
+
+/* The field has no box, so the strip's rule shows focus, in the same blue
+   and weight every other control uses. */
+.ask:focus-within {
+  border-top-color: var(--accent);
+  box-shadow: inset 0 1px 0 var(--accent);
+}
+
+.askSend {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: none;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+  transition:
+    background-color 0.2s ease-out,
+    color 0.2s ease-out;
+}
+
+.askSend:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+.askSend:disabled {
+  border-color: var(--rule-strong);
+  color: var(--soft);
+  cursor: default;
+}
+
+.askNote {
+  margin-top: 2px;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--soft);
+}
+
+/* ---- Narrow screens ------------------------------------------------------------ */
+
+@media (max-width: 760px) {
+  .bar {
+    padding-block: 16px 12px;
+  }
+
+  .nav {
+    gap: 2px 18px;
+  }
+
+  .stage {
+    align-content: start;
+    padding-block: 22px 12px;
+  }
+
+  .about {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portrait {
+    order: -1;
+    width: 88px;
+  }
+
+  .browser {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row {
+    padding-block: 5px;
+  }
+
+  /* With only the list showing, nothing is open yet. */
+  .browser:not([data-open]) .row[aria-current] {
+    color: var(--soft);
+  }
+
+  .browser:not([data-open]) .row[aria-current] .rowName {
+    text-decoration: none;
+  }
+
+  /* Room for one thing: the list, or the open entry with a way back. */
+  .browser:not([data-open]) .entry,
+  .browser[data-open] .index {
+    display: none;
+  }
+
+  .back {
+    display: block;
+  }
+}
+
+/* Short screens: everything a size tighter. */
+@media (max-height: 700px) {
+  .stage {
+    padding-block: 18px 12px;
+  }
+
+  .bar {
+    padding-block: 14px 10px;
+  }
+
+  .ask {
+    padding-block: 8px 10px;
+  }
+
+  .prose {
+    margin-top: 10px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .pubs {
+    gap: 14px;
+  }
+
+  .row {
+    padding-block: 4px;
+  }
+
+  .citation {
+    padding-block: 5px;
+  }
+
+  .citations {
+    margin-top: 14px;
+  }
+
+}
+
+@media (max-height: 700px) and (max-width: 760px) {
+  .portrait {
+    display: none;
+  }
+
+  .name {
+    font-size: 2.5rem;
+  }
+
+  .pubTitle {
+    font-size: 1.0625rem;
+  }
+
+  .pubs .meta:first-of-type {
+    display: none;
+  }
+
+  .back {
+    margin-bottom: 10px;
+  }
+
+  /* Three sources at a time, with a link to the others. */
+  .citations[data-page="0"] li:nth-child(n + 4),
+  .citations[data-page="1"] li:nth-child(-n + 3) {
+    display: none;
+  }
+
+  .moreSources {
+    display: block;
+  }
+}
+
+/* A phone on its side: only the essentials of the first page. */
+@media (max-height: 480px) {
+  .portrait {
+    display: none;
+  }
+
+  .name {
+    font-size: 2rem;
+  }
+
+  .statement {
+    margin-top: 8px;
+    font-size: 1rem;
+  }
+
+  .facts {
+    margin-top: 10px;
+    gap: 2px;
+    font-size: 0.8125rem;
+  }
+
+  .links {
+    margin-top: 8px;
+  }
+
+  .askNote {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .part,
+  .rise,
+  .bar,
+  .ask {
+    animation: none;
+  }
+}
+
+/* The skip link moves focus here; the region itself needs no ring. */
+.stage:focus {
+  outline: none;
+}
+
+/* Very little height (a phone on its side, a heavily zoomed window): one
+   thing at a time, as on a narrow phone, with lists set across the width. */
+@media (max-height: 520px) {
+  .stage {
+    padding-block: 12px 8px;
+  }
+
+  .bar {
+    padding-block: 10px 8px;
+  }
+
+  .ask {
+    padding-block: 4px 6px;
+  }
+
+  .browser {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .browser:not([data-open]) .entry,
+  .browser[data-open] .index {
+    display: none;
+  }
+
+  .browser:not([data-open]) .row[aria-current] {
+    color: var(--soft);
+  }
+
+  .browser:not([data-open]) .row[aria-current] .rowName {
+    text-decoration: none;
+  }
+
+  .back {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .index ul {
+    columns: 2;
+    column-gap: 48px;
+  }
+
+  .index li {
+    break-inside: avoid;
+  }
+
+  .intro {
+    margin-bottom: 10px;
+    font-size: 0.9375rem;
+  }
+
+  .group + .group,
+  .outro {
+    margin-top: 10px;
+  }
+
+  .groupTitle {
+    margin-bottom: 4px;
+  }
+
+  .entry {
+    max-width: none;
+  }
+
+  .entryName {
+    font-size: 1.375rem;
+  }
+
+  .prose,
+  .pager,
+  .links {
+    margin-top: 8px;
+  }
+
+  .papers {
+    max-width: none;
+  }
+
+  .pubs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  .pubTitle {
+    font-size: 1rem;
+  }
+
+  .reply {
+    margin-top: 6px;
+    font-size: 1rem;
+  }
+
+  .citations {
+    margin-top: 8px;
+  }
+
+  .citations[data-page="0"] li:nth-child(n + 4),
+  .citations[data-page="1"] li:nth-child(-n + 3) {
+    display: none;
+  }
+
+  .moreSources {
+    display: block;
+  }
+}
+
+/* A phone on its side has room for the essentials only. */
+@media (max-height: 420px) {
+  .entry .meta,
+  .outro,
+  .question {
+    display: none;
+  }
+
+  .reply {
+    margin-top: 0;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+  }
+
+  .citation {
+    padding-block: 3px;
+    font-size: 0.875rem;
+  }
+}
+
+/* Touch screens: everything tappable gets a taller target. */
+@media (pointer: coarse) {
+  .nav {
+    row-gap: 0;
+  }
+
+  .navLink {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .home {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+
+  .row,
+  .citation {
+    min-height: 42px;
+    padding-block: 0;
+    align-items: center;
+  }
+
+  .link,
+  .quiet,
+  .back {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding-block: 0;
+  }
+
+  .back {
+    margin-bottom: 4px;
+  }
+
+  .links {
+    row-gap: 0;
+  }
+
+  .askSend {
+    height: 44px;
+    padding-inline: 20px;
+  }
+}
+
+/* Short touch screens can't afford the full height everywhere without
+   scrolling, so targets there are as tall as the screen allows. */
+@media (pointer: coarse) and (max-height: 700px) {
+  .navLink,
+  .home {
+    min-height: 34px;
+  }
+
+  .row,
+  .citation {
+    min-height: 36px;
+  }
+
+  .link,
+  .quiet,
+  .back {
+    min-height: 32px;
+  }
+
+  .outro {
+    display: none;
+  }
+
+  .askSend {
+    height: 40px;
+  }
+}
+
+@media (pointer: coarse) and (max-height: 520px) {
+  .navLink,
+  .home,
+  .row,
+  .citation,
+  .link,
+  .quiet,
+  .back {
+    min-height: 30px;
+  }
+
+  .askSend {
+    height: 36px;
+  }
+}

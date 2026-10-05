@@ -34,3 +34,8 @@ next-env.d.ts
 __pycache__/
 *.pyc
 backend/.venv/
+
+# local tool settings and design-review scratch (screenshots, decision logs)
+.claude/settings.local.json
+.impeccable/review/
+.impeccable/questions/

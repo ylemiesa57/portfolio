@@ -1,29 +1,30 @@
-import type { Metadata } from "next";
-import { Archivo_Black, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Archivo, STIX_Two_Text } from "next/font/google";
 import "./globals.css";
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-mono",
+// Two voices: STIX Two Text, the face scientific publishing set itself in,
+// for everything that is read; Archivo for the bar, lists and small print.
+const stix = STIX_Two_Text({
+  variable: "--font-stix",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
 });
 
-const plexSans = IBM_Plex_Sans({
-  variable: "--font-sans",
+const archivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
-
-const archivoBlack = Archivo_Black({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: "400",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Yaphet Lemiesa — Working Drawing",
+  title: "Yaphet Lemiesa",
   description:
-    "Hardware, AI, and robotics work, drawn straight from the GitHub source.",
+    "Research and systems by Yaphet Lemiesa, MIT EECS: cyber risk on small data, retrieval over knowledge graphs, memory-bound inference and agent evaluation. Ask it a question.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f7f7f5",
 };
 
 export default function RootLayout({
@@ -36,11 +37,7 @@ export default function RootLayout({
     // attributes onto <html>/<body> before React hydrates, which otherwise
     // trips a hydration mismatch. This suppresses only attribute-level noise on
     // these two elements, not real mismatches inside the app.
-    <html
-      lang="en"
-      className={`${plexMono.variable} ${plexSans.variable} ${archivoBlack.variable}`}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={`${stix.variable} ${archivo.variable}`} suppressHydrationWarning>
       <body suppressHydrationWarning>{children}</body>
     </html>
   );

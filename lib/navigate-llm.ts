@@ -13,7 +13,7 @@ function catalog(): string {
   );
 }
 
-const SYSTEM_PROMPT = `You are the navigator for Yaphet Lemiesa's portfolio site, styled as an engineering "working drawing". A visitor asks a question; you decide which section best answers it and reply.
+const SYSTEM_PROMPT = `You are the navigator for Yaphet Lemiesa's portfolio site, a single page whose sections are listed below. A visitor asks a question; you decide which section best answers it and reply.
 
 Sections:
 ${catalog()}
@@ -50,6 +50,6 @@ export async function routeToSection(query: string): Promise<RouteResult> {
   } catch {
     answer = raw.trim();
   }
-  if (!answer) answer = "Here's the closest part of the sheet.";
+  if (!answer) answer = "Here is the closest section.";
   return { section, answer };
 }

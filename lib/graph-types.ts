@@ -60,5 +60,5 @@ export interface RetrievalResult {
  */
 export type Retrieve = (
   query: string,
-  opts?: { k?: number; hops?: number }
+  opts?: { k?: number; hops?: number; [extra: string]: unknown }
 ) => Promise<RetrievalResult>;

@@ -580,3 +580,71 @@ export const ossContributions: OSSContribution[] = [
     url: "https://github.com/f4pga/prjxray/pull/2571",
   },
 ];
+
+// ---- Research ----------------------------------------------------------------
+// The Research section. Nothing here is a new claim: each thread regroups work
+// already recorded above (experience, publications, projects, write-ups) under
+// the question it was trying to answer. `members` are knowledge-graph node ids
+// (see lib/graph-build.ts); a member that isn't in the graph on a given render
+// (a repo GitHub didn't return, say) is simply left out.
+
+export const researchStatement =
+  "I work on AI systems where the constraint is the interesting part: risk models that have to learn from small, noisy data, retrieval that runs over a graph you can inspect, inference that has to fit in 8 GB of shared memory, and agents that have to be evaluated before they touch production.";
+
+export interface ResearchThread {
+  slug: string;
+  name: string;
+  /** Where and when the work happens, as the record states it. */
+  setting: string;
+  summary: string;
+  members: string[];
+}
+
+export const researchThreads: ResearchThread[] = [
+  {
+    slug: "cyber-risk",
+    name: "Cyber risk on small, noisy data",
+    setting: "Cybersecurity at MIT Sloan (CAMS), since Sept. 2024",
+    summary:
+      "A quantitative simulation that couples Monte Carlo with a self-learning Bayesian loop to flag zero-day anomalies in network telemetry and forecast financial exposure, with the Colonial Pipeline incident as the case study. The papers ask when AI helps critical-infrastructure risk management and when the data is too thin for it to.",
+    members: [
+      "experience:cams",
+      "paper:how-does-ai-transform-cyber-risk-management",
+      "paper:ai-on-small-and-noisy-data-is-ineffective-for-ics-cyber-risk",
+      "paper:how-should-managers-use-ai-for-critical-infrastructure-risk-",
+      "award:best-paper-nominee",
+      "award:outstanding-urop-student-award",
+      "repo:ai-bom-analysis",
+    ],
+  },
+  {
+    slug: "graph-retrieval",
+    name: "Retrieval over knowledge graphs",
+    setting: "NASA Jet Propulsion Laboratory, 2025, and my own engine since",
+    summary:
+      "At JPL, a RAG pipeline that generates knowledge graphs from more than twenty PDF specifications to speed up systems verification. Afterwards Boltless, a property-graph and graph-RAG engine written from scratch with hybrid vector and personalized-PageRank retrieval, which serves the chart at the top of this page.",
+    members: ["experience:jpl", "repo:boltless", "repo:portfolio", "skillgroup:ai-ml-simulation"],
+  },
+  {
+    slug: "edge-inference",
+    name: "Memory-bound inference at the edge",
+    setting: "MIT 6.5931, research paper 2025–2026, and the hardware underneath",
+    summary:
+      "An analytical model of retrieval-augmented generation on a Jetson Orin Nano-class accelerator, built in AccelForge. The measured result ran against my intuition: retrieval never exceeds 0.7% of total energy and the system is memory-bound by a wide margin. The same interest shows up lower in the stack, in a RISC-V core with a SIMD dot-product instruction and an FPGA lane-detection pipeline.",
+    members: [
+      "project:edge-rag-llm-accelerator",
+      "repo:6.5931-Final-Project",
+      "repo:riscv-simd-core",
+      "repo:fpga-autonomous-robot-car",
+      "education:mit",
+    ],
+  },
+  {
+    slug: "agents-evaluation",
+    name: "Agents, and how to evaluate them",
+    setting: "Bloomberg L.P., since May 2026",
+    summary:
+      "A production DevOps agent on an LLM plan-and-act loop with runbook RAG, and the evaluation architecture around it: regression suites, LLM-as-judge and golden-trace replay, so remediation accuracy is validated before deployment. In the open, a fix to a prompt-injection benchmark for agent robustness.",
+    members: ["experience:bloomberg", "repo:bamdadd/leakgauge"],
+  },
+];

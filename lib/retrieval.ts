@@ -19,6 +19,17 @@ import { embed } from "./embed";
 import { boltlessRetrieve, type BoltlessEdge, type BoltlessNode } from "./graph";
 import type { Retrieve, GEdge, GNode } from "./graph-types";
 
+/** Optional progress hook so the Ask UI can narrate each stage as it really
+ *  happens (and how long it took) instead of guessing. */
+export type RetrieveStage = "embed" | "retrieve";
+export interface RetrieveProgress {
+  onStage?: (
+    stage: RetrieveStage,
+    status: "start" | "done",
+    info: { ms?: number; seeds?: number; nodes?: number; edges?: number }
+  ) => void;
+}
+
 // Keep the LLM context (and the viz) manageable regardless of fan-out. This
 // used to be enforced by hand in this file; now it's the `top_n` Boltless is
 // asked for directly, since Boltless returns nodes already ranked by hybrid
@@ -41,12 +52,24 @@ function toGNode(n: BoltlessNode): GNode {
 export const retrieve: Retrieve = async (query, opts) => {
   const k = Math.max(1, Math.floor(opts?.k ?? 5));
   const hops = Math.max(1, Math.min(3, Math.floor(opts?.hops ?? 1)));
+  const onStage = (opts as RetrieveProgress | undefined)?.onStage;
 
   // 1. Embed the query.
+  let t0 = Date.now();
+  onStage?.("embed", "start", {});
   const qvec = await embed(query, "RETRIEVAL_QUERY");
+  onStage?.("embed", "done", { ms: Date.now() - t0 });
 
   // 2. Hybrid vector + graph retrieval, scored server-side by Boltless.
+  t0 = Date.now();
+  onStage?.("retrieve", "start", {});
   const result = await boltlessRetrieve(qvec, { k, hops, topN: TOP_N });
+  onStage?.("retrieve", "done", {
+    ms: Date.now() - t0,
+    seeds: result.seedIds.length,
+    nodes: result.nodes.length,
+    edges: result.edges.length,
+  });
 
   // 3. Map the generic response onto the portfolio's GNode/GEdge shape.
   const nodes: GNode[] = result.nodes.map(toGNode);

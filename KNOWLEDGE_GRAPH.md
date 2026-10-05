@@ -18,7 +18,7 @@ plain section routing. Boltless removes that dependency entirely — the graph
 engine is a small Python service shipped as part of this same Vercel
 deployment, not a third-party managed database that can expire.
 
-The Ask dock, Modules carousel, and Hero on `main` are unchanged. This
+The Ask feature, the projects grid, and the first page were unchanged by this
 migration only swaps the graph storage/retrieval layer.
 
 ## Architecture: two Vercel Services, one deployment
@@ -62,7 +62,7 @@ Everything talks through `retrieve()` in `lib/graph-types.ts`. As long as it
 returns `{ nodes, edges, seedIds }`, the API + viz just work — that's why
 this migration only touches the storage/retrieval layer (`lib/graph.ts`,
 `lib/retrieval.ts`, `scripts/ingest.ts`, `scripts/build_snapshot.py`,
-`backend/`, `vercel.json`) and leaves the Ask dock, carousel, and Hero
+`backend/`, `vercel.json`) and leaves the Ask UI, the projects grid and the first page
 alone. `/api/ask` **falls back to section routing** if the graph service or
 the Gemini embeddings call isn't reachable — the subgraph visualization only
 renders when a GraphRAG answer actually comes back grounded (`grounded:
