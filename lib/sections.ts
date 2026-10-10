@@ -1,11 +1,11 @@
-// Single source of truth for the page's navigable sections. Consumed by
-// app/page.tsx (to stamp anchor ids onto each section) and by the LLM
-// navigator (both the API system prompt and the client-side scroll executor).
-// Keep ids in sync with the order sections are rendered in app/page.tsx.
+// The kinds of content the site holds, by the ids the knowledge graph stamps
+// on its nodes. Consumed by the LLM navigator (its system prompt picks one of
+// these) and by the page, which maps each id to the view that shows it
+// (components/site/Site.tsx, VIEW_OF_SECTION).
 
 export interface SectionSpec {
   id: string;
-  // Sheet label shown in the drafting-sheet UI and the command bar.
+  // Label used when the page names the section.
   label: string;
   // Plain-language description the local model uses to route a question to a
   // section. Written from the visitor's side: what they'd actually ask for.
@@ -15,15 +15,21 @@ export interface SectionSpec {
 export const SECTIONS: SectionSpec[] = [
   {
     id: "hero",
-    label: "Working drawing",
+    label: "About",
     keywords:
-      "the intro, who Yaphet is, his tagline and summary, overview stats, top of the page, start over, home, education, MIT, degree, coursework, work experience, internships, Bloomberg, Jet Propulsion Laboratory, NASA, JPL, Zenyai, CAMS, MIT Sloan, technical skills, what languages or tools he knows",
+      "the intro, who Yaphet is, his summary, the first page, start over, home",
   },
   {
-    id: "modules",
-    label: "Projects",
+    id: "research",
+    label: "Research",
     keywords:
-      "projects, repositories, GitHub repos, code, the things he has built, hardware, AI/ML, systems, data projects, portfolio work",
+      "research interests, research statement, what he studies, research threads, cyber risk, retrieval and knowledge graphs, edge inference, hardware for machine learning, agents and evaluation",
+  },
+  {
+    id: "publications",
+    label: "Publications",
+    keywords:
+      "research papers, publications, academic work, Google Scholar, citations, cyber risk, ICS, papers he has written or co-authored",
   },
   {
     id: "awards",
@@ -32,10 +38,16 @@ export const SECTIONS: SectionSpec[] = [
       "awards, honors, recognition, the Outstanding UROP Student Award, best paper nominee, hackathon wins, prizes",
   },
   {
-    id: "publications",
-    label: "Publications",
+    id: "modules",
+    label: "Projects",
     keywords:
-      "research papers, publications, academic work, Google Scholar, cyber risk, ICS, papers he has written or co-authored",
+      "projects, repositories, GitHub repos, code, the things he has built, hardware, AI/ML, systems, data projects, portfolio work",
+  },
+  {
+    id: "experience",
+    label: "Experience",
+    keywords:
+      "work experience, internships, Bloomberg, Jet Propulsion Laboratory, NASA, JPL, Zenyai, CAMS, MIT Sloan, education, MIT, degree, coursework, technical skills, what languages or tools he knows, resume, CV",
   },
   {
     id: "oss",
@@ -45,7 +57,7 @@ export const SECTIONS: SectionSpec[] = [
   },
   {
     id: "initiatives",
-    label: "Initiatives",
+    label: "Community",
     keywords:
       "communities, clubs, leadership, Claude Builders Club at MIT, MIT EESA, Selamta Family Project, charity, volunteering, organizing",
   },
@@ -53,8 +65,22 @@ export const SECTIONS: SectionSpec[] = [
     id: "contact",
     label: "Contact",
     keywords:
-      "contact, email, get in touch, reach out, LinkedIn, GitHub profile, hire, connect, bottom of the page",
+      "contact, email, get in touch, reach out, LinkedIn, GitHub profile, hire, connect",
   },
 ];
 
 export const SECTION_IDS = SECTIONS.map((s) => s.id);
+
+export function sectionById(id: string): SectionSpec | undefined {
+  return SECTIONS.find((s) => s.id === id);
+}
+
+// Experience, education and skills used to live in the first section, and the
+// served graph snapshot may still say so until the next ingest. Resolve by
+// kind so a cited job or degree always lands on the Experience section.
+const EXPERIENCE_KINDS = new Set(["Experience", "Education", "SkillGroup"]);
+
+export function sectionForNode(node: { type: string; sectionId: string }): string {
+  if (EXPERIENCE_KINDS.has(node.type)) return "experience";
+  return sectionById(node.sectionId) ? node.sectionId : "hero";
+}

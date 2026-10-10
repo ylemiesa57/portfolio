@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-04T00:00:00Z",
+  "title": "Design System: Yaphet Lemiesa",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Attention Blue",
+        "canonical": "oklch(42.2% 0.169 269)",
+        "tonalRamp": [
+          "oklch(15% 0.169 269)",
+          "oklch(26% 0.169 269)",
+          "oklch(38% 0.169 269)",
+          "oklch(49% 0.169 269)",
+          "oklch(61% 0.169 269)",
+          "oklch(72% 0.169 269)",
+          "oklch(84% 0.169 269)",
+          "oklch(95% 0.169 269)"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(97.6% 0.003 106)",
+        "tonalRamp": [
+          "oklch(15% 0.003 106)",
+          "oklch(26% 0.003 106)",
+          "oklch(38% 0.003 106)",
+          "oklch(49% 0.003 106)",
+          "oklch(61% 0.003 106)",
+          "oklch(72% 0.003 106)",
+          "oklch(84% 0.003 106)",
+          "oklch(95% 0.003 106)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(20.5% 0.010 268)",
+        "tonalRamp": [
+          "oklch(15% 0.010 268)",
+          "oklch(26% 0.010 268)",
+          "oklch(38% 0.010 268)",
+          "oklch(49% 0.010 268)",
+          "oklch(61% 0.010 268)",
+          "oklch(72% 0.010 268)",
+          "oklch(84% 0.010 268)",
+          "oklch(95% 0.010 268)"
+        ]
+      },
+      "soft": {
+        "role": "neutral",
+        "displayName": "Soft Grey",
+        "canonical": "oklch(50.8% 0.016 272)",
+        "tonalRamp": [
+          "oklch(15% 0.016 272)",
+          "oklch(26% 0.016 272)",
+          "oklch(38% 0.016 272)",
+          "oklch(49% 0.016 272)",
+          "oklch(61% 0.016 272)",
+          "oklch(72% 0.016 272)",
+          "oklch(84% 0.016 272)",
+          "oklch(95% 0.016 272)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(91.2% 0.005 107)",
+        "tonalRamp": [
+          "oklch(15% 0.005 107)",
+          "oklch(26% 0.005 107)",
+          "oklch(38% 0.005 107)",
+          "oklch(49% 0.005 107)",
+          "oklch(61% 0.005 107)",
+          "oklch(72% 0.005 107)",
+          "oklch(84% 0.005 107)",
+          "oklch(95% 0.005 107)"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "oklch(79.0% 0.008 279)",
+        "tonalRamp": [
+          "oklch(15% 0.008 279)",
+          "oklch(26% 0.008 279)",
+          "oklch(38% 0.008 279)",
+          "oklch(49% 0.008 279)",
+          "oklch(61% 0.008 279)",
+          "oklch(72% 0.008 279)",
+          "oklch(84% 0.008 279)",
+          "oklch(95% 0.008 279)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name on the first view, once."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The name of the open entry."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "A publication's title."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "The statement on the first view; the Ask answer is set at the same scale."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Entry paragraphs and the intro above a list; 1rem / 1.5 on short screens."
+      },
+      "ui": {
+        "displayName": "UI",
+        "purpose": "Bar links, list rows, fact rows, text links, citation rows."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "The line under an entry name, authors and venue, the pager, quiet actions, the Ask button label (at 600)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "The heading of a group within a list; at 400, the aside at the right of a row."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The --ease token: every arrival animation (parts of words, fades, bar, Ask strip)."
+      },
+      {
+        "name": "arrive",
+        "value": "0.55s var(--ease) both; from opacity 0, blur(5px), translateY(0.14em)",
+        "purpose": "One part of a word arriving. Parts are two or three letters; the default interval is 22ms, shortened so a run ends within its cap (default 1100ms)."
+      },
+      {
+        "name": "settle",
+        "value": "0.7s var(--ease) both; from opacity 0",
+        "purpose": "Lists, meta lines, links and the portrait fade in, lightly staggered. The bar and Ask strip use it once at 0.9s (strip delayed 0.3s)."
+      },
+      {
+        "name": "later-pace",
+        "value": "parts 0.4s at 0.28x delay; fades 0.45s at 90ms",
+        "purpose": "After the first move between views the sequence plays fast. The Ask answer keeps the full pace; fades in the answer view wait 500ms."
+      },
+      {
+        "name": "state",
+        "value": "0.2s ease-out",
+        "purpose": "Colour, background-colour and underline-colour changes on hover. Nothing moves on interaction."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none",
+        "purpose": "All arrival animations are off; the finished page shows at once."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "max-width: 760px"
+      },
+      {
+        "name": "short",
+        "value": "max-height: 700px"
+      },
+      {
+        "name": "very-short",
+        "value": "max-height: 520px"
+      },
+      {
+        "name": "sideways-phone",
+        "value": "max-height: 480px"
+      },
+      {
+        "name": "essentials",
+        "value": "max-height: 420px"
+      },
+      {
+        "name": "container-max",
+        "value": "1240px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Bar",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "The name and the seven view links over a hairline; the current view is ink with a 1px underline.",
+      "html": "<header class=\"ds-bar\"><a class=\"ds-home\" href=\"#about\">Yaphet Lemiesa</a><nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#about\" aria-current=\"page\">About</a><a class=\"ds-nav-link\" href=\"#research\">Research</a><a class=\"ds-nav-link\" href=\"#publications\">Publications</a><a class=\"ds-nav-link\" href=\"#projects\">Projects</a></nav></header>",
+      "css": ".ds-bar { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 32px; padding-block: 22px 18px; border-bottom: 1px solid var(--rule); background: var(--ground); } .ds-home { font-family: var(--font-text); font-size: 1.125rem; font-weight: 600; color: var(--ink); text-decoration: none; } .ds-nav { display: flex; flex-wrap: wrap; gap: 4px 26px; } .ds-nav-link { padding-block: 4px; font-family: var(--font-ui); font-size: 0.9375rem; color: var(--soft); text-decoration: none; transition: color 0.2s ease-out; } .ds-nav-link:hover { color: var(--ink); } .ds-nav-link[aria-current] { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.45em; } .ds-home:focus-visible, .ds-nav-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "List Row",
+      "kind": "custom",
+      "refersTo": "list-row",
+      "description": "A row in a view's list: name at left, quiet aside at right; soft at rest, ink when hovered or current.",
+      "html": "<div class=\"ds-list\"><h2 class=\"ds-group-title\">Experience</h2><button class=\"ds-row\" aria-current=\"true\"><span class=\"ds-row-name\">Software Engineer Intern, Bloomberg</span><span class=\"ds-row-aside\">2026 to now</span></button><button class=\"ds-row\"><span class=\"ds-row-name\">Engineering Intern, NASA JPL</span><span class=\"ds-row-aside\">2025</span></button></div>",
+      "css": ".ds-list { max-width: 23rem; background: var(--ground); } .ds-group-title { margin: 0 0 14px; font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 600; color: var(--soft); } .ds-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 6px 0; border: 0; background: none; text-align: left; font-family: var(--font-ui); font-size: 0.9375rem; line-height: 1.35; color: var(--soft); cursor: pointer; transition: color 0.2s ease-out; } .ds-row:hover, .ds-row[aria-current] { color: var(--ink); } .ds-row[aria-current] .ds-row-name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.32em; } .ds-row-aside { flex: none; font-size: 0.8125rem; color: var(--soft); } .ds-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "Open Entry",
+      "kind": "custom",
+      "description": "The entry beside the list: headline, one meta line, body paragraphs, the pager when it does not fit, then text links.",
+      "html": "<article class=\"ds-entry\"><h2 class=\"ds-entry-name\">boltless</h2><p class=\"ds-meta\">Python · pushed Aug 2026</p><p class=\"ds-prose\">An embeddable property-graph and graph-RAG engine in pure standard-library Python, with no dependencies.</p><p class=\"ds-pager\"><span>1 of 2</span><button class=\"ds-quiet\">Continue</button></p><p class=\"ds-links\"><a class=\"ds-link\" href=\"#\">Repository</a></p></article>",
+      "css": ".ds-entry { max-width: 38rem; background: var(--ground); color: var(--ink); font-family: var(--font-text); } .ds-entry p, .ds-entry h2 { margin: 0; } .ds-entry-name { font-size: clamp(1.625rem, 3vw, 2.25rem); font-weight: 400; line-height: 1.12; letter-spacing: -0.012em; } .ds-meta { margin-top: 6px !important; font-family: var(--font-ui); font-size: 0.875rem; line-height: 1.5; color: var(--soft); } .ds-prose { margin-top: 14px !important; font-size: 1.0625rem; line-height: 1.55; } .ds-pager { display: flex; align-items: baseline; margin-top: 14px !important; font-family: var(--font-ui); font-size: 0.875rem; color: var(--soft); } .ds-quiet { margin-left: 12px; padding: 4px 0; border: 0; background: none; font-family: var(--font-ui); font-size: 0.875rem; color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 0.28em; cursor: pointer; } .ds-quiet:hover { text-decoration-color: currentColor; } .ds-links { margin-top: clamp(18px, 3vh, 28px) !important; font-family: var(--font-ui); font-size: 0.9375rem; } .ds-link { color: inherit; text-decoration: underline; text-decoration-color: var(--rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.28em; transition: text-decoration-color 0.2s ease-out; } .ds-link:hover { text-decoration-color: currentColor; } .ds-quiet:focus-visible, .ds-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "Text Link",
+      "kind": "custom",
+      "refersTo": "text-link",
+      "description": "An underlined word: faint 1px underline at rest that darkens to the text colour on hover.",
+      "html": "<p class=\"ds-linkrow\"><a class=\"ds-tlink\" href=\"#\">Email</a><a class=\"ds-tlink\" href=\"#\">LinkedIn</a><a class=\"ds-tlink\" href=\"#\">GitHub</a><a class=\"ds-tlink\" href=\"#\">Google Scholar</a></p>",
+      "css": ".ds-linkrow { display: flex; flex-wrap: wrap; gap: 6px 24px; margin: 0; font-family: var(--font-ui); font-size: 0.9375rem; color: var(--ink); background: var(--ground); } .ds-tlink { color: inherit; text-decoration: underline; text-decoration-color: var(--rule-strong); text-decoration-thickness: 1px; text-underline-offset: 0.28em; transition: text-decoration-color 0.2s ease-out; } .ds-tlink:hover { text-decoration-color: currentColor; } .ds-tlink:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "Ask Strip",
+      "kind": "input",
+      "refersTo": "ask-field",
+      "description": "The boxless question field and its outlined button over a hairline; the strip's rule turns to 2px of blue while it holds focus.",
+      "html": "<footer class=\"ds-ask\"><form class=\"ds-ask-form\" onsubmit=\"return false\"><input class=\"ds-ask-input\" type=\"text\" placeholder=\"Ask anything about my work\" aria-label=\"Ask a question about my work\"><button class=\"ds-ask-send\" type=\"submit\">Ask</button></form><p class=\"ds-ask-note\">The graph is offline, so answers point to a page instead.</p></footer>",
+      "css": ".ds-ask { padding-block: 14px 18px; border-top: 1px solid var(--rule); background: var(--ground); } .ds-ask:focus-within { border-top-color: var(--accent); box-shadow: inset 0 1px 0 var(--accent); } .ds-ask-form { display: flex; align-items: center; gap: 16px; margin: 0; } .ds-ask-input { flex: 1; min-width: 0; height: 44px; padding: 0; border: 0; border-radius: 0; background: none; font-family: var(--font-text); font-size: 1.125rem; color: var(--ink); caret-color: var(--accent); } .ds-ask-input::placeholder { color: var(--soft); opacity: 1; } .ds-ask-input:focus-visible { outline: none; } .ds-ask-send { height: 36px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 0; background: none; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 600; color: var(--ink); cursor: pointer; transition: background-color 0.2s ease-out, color 0.2s ease-out; } .ds-ask-send:hover:not(:disabled) { background: var(--ink); color: var(--ground); } .ds-ask-send:disabled { border-color: var(--rule-strong); color: var(--soft); cursor: default; } .ds-ask-send:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; } .ds-ask-note { margin: 2px 0 0; font-family: var(--font-ui); font-size: 0.75rem; color: var(--soft); }"
+    },
+    {
+      "name": "Ask Button",
+      "kind": "button",
+      "refersTo": "ask-button",
+      "description": "The one outlined control; inverts to ink on hover, greys out while an answer is being produced.",
+      "html": "<div class=\"ds-btnrow\"><button class=\"ds-btn-ask\">Ask</button><button class=\"ds-btn-ask\" disabled>Ask</button></div>",
+      "css": ".ds-btnrow { display: flex; gap: 16px; background: var(--ground); } .ds-btn-ask { height: 36px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 0; background: none; font-family: var(--font-ui); font-size: 0.875rem; font-weight: 600; color: var(--ink); cursor: pointer; transition: background-color 0.2s ease-out, color 0.2s ease-out; } .ds-btn-ask:hover:not(:disabled) { background: var(--ink); color: var(--ground); } .ds-btn-ask:disabled { border-color: var(--rule-strong); color: var(--soft); cursor: default; } .ds-btn-ask:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "Citation Row",
+      "kind": "custom",
+      "refersTo": "citation-row",
+      "description": "A source under an answer: hairline-separated rows that turn blue on hover and open the view that proves them.",
+      "html": "<ol class=\"ds-citations\"><li><button class=\"ds-citation\"><span>boltless</span><span class=\"ds-cite-aside\">Projects</span></button></li><li><button class=\"ds-citation\"><span>Engineering Intern, Jet Propulsion Laboratory (NASA)</span><span class=\"ds-cite-aside\">Experience</span></button></li></ol>",
+      "css": ".ds-citations { max-width: 42rem; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule); background: var(--ground); } .ds-citation { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; width: 100%; padding: 9px 0; border: 0; border-bottom: 1px solid var(--rule); background: none; text-align: left; font-family: var(--font-ui); font-size: 0.9375rem; color: var(--ink); cursor: pointer; transition: color 0.2s ease-out; } .ds-citation:hover { color: var(--accent); } .ds-cite-aside { flex: none; font-size: 0.8125rem; color: var(--soft); } .ds-citation:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }"
+    },
+    {
+      "name": "Fact Rows",
+      "kind": "custom",
+      "description": "The Now / Before / Degree definition list on the first view: soft labels, ink values.",
+      "html": "<dl class=\"ds-facts\"><div><dt>Now</dt><dd><span>Quantitative Researcher, MIT Sloan CAMS</span><span>Software Engineer Intern, Bloomberg</span></dd></div><div><dt>Before</dt><dd><span>NASA JPL · Zenyai</span></dd></div></dl>",
+      "css": ".ds-facts { display: grid; gap: 6px; margin: 0; font-family: var(--font-ui); font-size: 0.9375rem; line-height: 1.45; color: var(--ink); background: var(--ground); } .ds-facts > div { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); gap: 12px; } .ds-facts dt { color: var(--soft); } .ds-facts dd { margin: 0; } .ds-facts dd span { display: block; }"
+    },
+    {
+      "name": "Publication",
+      "kind": "custom",
+      "description": "A paper: semibold serif title, then authors and an italic venue in soft small print.",
+      "html": "<div class=\"ds-pub\"><h2 class=\"ds-pub-title\">Title of the paper as published</h2><p class=\"ds-pub-meta\">Y. Lemiesa and co-authors</p><p class=\"ds-pub-meta\"><em>Venue, 2025</em> · cited by 10</p></div>",
+      "css": ".ds-pub { max-width: 44rem; background: var(--ground); } .ds-pub-title { margin: 0; font-family: var(--font-text); font-size: clamp(1.125rem, 1.7vw, 1.375rem); font-weight: 600; line-height: 1.3; color: var(--ink); } .ds-pub-meta { margin: 3px 0 0; font-family: var(--font-ui); font-size: 0.875rem; line-height: 1.5; color: var(--soft); }"
+    },
+    {
+      "name": "The Reveal",
+      "kind": "custom",
+      "description": "Signature motion: read text arrives a part of a word (two or three letters) at a time, fading and sharpening in sequence.",
+      "html": "<p class=\"ds-reveal\"><span class=\"ds-word\"><span class=\"ds-part\" style=\"--d:0ms\">Yap</span><span class=\"ds-part\" style=\"--d:85ms\">het</span></span> <span class=\"ds-word\"><span class=\"ds-part\" style=\"--d:170ms\">Lem</span><span class=\"ds-part\" style=\"--d:255ms\">ie</span><span class=\"ds-part\" style=\"--d:340ms\">sa</span></span></p>",
+      "css": ".ds-reveal { margin: 0; font-family: var(--font-text); font-size: clamp(2.75rem, 7vw, 5.25rem); font-weight: 400; line-height: 1; letter-spacing: -0.022em; color: var(--ink); background: var(--ground); } .ds-word { display: inline-block; white-space: nowrap; } .ds-part { display: inline-block; animation: ds-arrive 0.55s var(--ease) both; animation-delay: var(--d, 0ms); } @keyframes ds-arrive { from { opacity: 0; filter: blur(5px); transform: translateY(0.14em); } } @media (prefers-reduced-motion: reduce) { .ds-part { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Page",
+    "overview": "The whole site is one screen that does not scroll: a bar, the view, and a field to ask a question. There is one ground, one ink, a soft grey for whatever is secondary, and hairlines where two regions meet. Everything a visitor reads is set in a serif built for scientific publishing; everything they operate is set in a plain sans. The page is a sheet of text with nothing on it that is not text, a rule, or the one portrait.\n\nRestraint is a rule of this system, not a mood. It was asked for directly, after an ornate build was rejected: much simpler, less content, less motion, quieter colour and type, no scrolling. A new surface earns its place by removing something, and anything added has to be made of the materials already here (a word, an underline, a hairline, a change from soft to ink). The single flourish the system allows itself is how text arrives: a part of a word at a time, quickly, then still.\n\nRejected by the user and not to return: the decorated portfolio (plates, panels, ornament, a display face for show, a bright signal colour) and the long scrolling portfolio.",
+    "keyCharacteristics": [
+      "One screen, three rows: bar, view, Ask strip. Views change in place; the address hash carries the view and the open entry.",
+      "One ground, one ink, one soft grey, two hairline weights of grey, one blue that only marks attention.",
+      "Two faces: STIX Two Text for what is read, Archivo for what is operated.",
+      "No panels, no shadows, no radius, no icons. Links are underlined words; controls are words.",
+      "Text arrives a part of a word at a time; lists and small print only fade.",
+      "Light only (`color-scheme: light`); there is no dark theme."
+    ],
+    "rules": [
+      {
+        "name": "The Restraint Rule",
+        "body": "Nothing is added that the reading does not need. Before adding a colour, a weight, a size, a container or a movement, try the existing soft-to-ink change, an underline, or a hairline. If those cannot carry it, the thing probably does not belong on this page.",
+        "section": "overview"
+      },
+      {
+        "name": "The One Blue Rule",
+        "body": "Blue marks where attention is right now: focus, the caret, the citation under the pointer. If a blue thing would still be blue with nobody touching the page, it is wrong.",
+        "section": "colors"
+      },
+      {
+        "name": "The Soft-to-Ink Rule",
+        "body": "Choices rest in Soft Grey and become Ink when hovered or current. The current one also takes a 1px underline. That change is the entire selection vocabulary; there is no highlight bar, fill, or marker.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inversion Rule",
+        "body": "The only emphatic state is swapping Ink and Paper: the text selection, the skip link, and the Ask button under the pointer. No third colour is used for emphasis.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "If it is read, it is STIX Two Text. If it is operated or is small print about something read, it is Archivo. A third family is never introduced, and neither face is used for the other's job.",
+        "section": "typography"
+      },
+      {
+        "name": "The Plain Setting Rule",
+        "body": "Sentence case everywhere. No uppercase, no positive letter-spacing, no small caps. Weight is 400 by default; 600 appears only on the name in the bar, publication titles, group headings and the Ask button. Italic is for a venue or a title within text, never for emphasis by habit.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Screen Rule",
+        "body": "The page never scrolls. New content gets a view in the bar, an entry in a list, or a page within an entry; it never gets length.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Thing Rule",
+        "body": "When there is not room for the list and the entry together, show one, with a worded way back. Do not shrink both to fit.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Page Rule",
+        "body": "Nothing sits on top of anything. If a design needs a surface above the page (a modal, a popover, a card, a drawer), it becomes a view instead.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Hairline Rule",
+        "body": "A line is 1px and horizontal, in Hairline between regions and Strong Hairline under words. Lines never enclose content; the Ask button is the only outlined box on the page.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Arrival Rule",
+        "body": "Motion is how text arrives and nothing else. Only read text gets the part-by-part reveal; everything else fades; nothing moves in response to hover, scroll or selection.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do keep the page to one viewport: bar, view, Ask strip. Add a view, an entry or a page within an entry instead of length.",
+      "Do set everything read in STIX Two Text and everything operated in Archivo, in sentence case, at weight 400 unless it is one of the four places that take 600.",
+      "Do show choice by the Soft-to-Ink change plus a 1px underline on the current item.",
+      "Do separate regions with a 1px Hairline and items with space (6, 14, 16, 22px).",
+      "Do write controls as words: \"Back to the list\", \"Continue\", \"Close\", \"3 more sources\".",
+      "Do keep Attention Blue to focus, the caret, the focused Ask strip and citation hover.",
+      "Do say failures and gaps in a plain sentence in the place they occur (the graph is offline; GitHub didn't answer this hour).",
+      "Do give every animation a reduced-motion state that shows the finished page at once."
+    ],
+    "donts": [
+      "Don't add panels, cards, tinted areas, shadows, gradients, rounded corners, or anything that sits above the page. The only fill is the inversion to Ink.",
+      "Don't add icons, arrows, glyph bullets or emoji as interface; an action is its word.",
+      "Don't add a second accent, a tinted background, or blue on anything at rest.",
+      "Don't introduce a third typeface, uppercase labels, tracked-out small print, or a display face for show.",
+      "Don't let the document scroll, and don't use a view-level scrollbar as a design choice; it exists only as a last resort.",
+      "Don't animate on hover, scroll or selection, and don't make navigation wait for the reveal.",
+      "Don't bring back ornament from the retired builds: plates, charts, borders that enclose content, a bright signal colour.",
+      "Don't add images beyond the one portrait without a decision to change this system."
+    ]
+  }
+}

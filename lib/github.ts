@@ -116,7 +116,16 @@ const DOMAIN_KEYWORDS: Record<Domain, string[]> = {
   data: ["finance", "analysis", "screener", "fundamentals", "bom", "data"],
 };
 
+// Repos the keyword pass gets wrong. The portfolio's GitHub description lists
+// the fields its contents cover ("hardware/AI/robotics work"), which reads as a
+// hardware project; it is a retrieval system.
+const DOMAIN_OVERRIDES: Record<string, Domain> = {
+  portfolio: "ai_ml",
+};
+
 export function classifyDomain(repo: GithubRepo): Domain {
+  const override = DOMAIN_OVERRIDES[repo.name];
+  if (override) return override;
   const haystack = `${repo.name} ${repo.description ?? ""} ${repo.language ?? ""} ${repo.topics.join(" ")}`.toLowerCase();
   for (const domain of ["hardware", "ai_ml", "systems", "data"] as Domain[]) {
     if (DOMAIN_KEYWORDS[domain].some((kw) => haystack.includes(kw))) {
