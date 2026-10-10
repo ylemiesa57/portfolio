@@ -9,6 +9,54 @@
   padding-inline: var(--gutter);
 }
 
+/* ---- Loader ---------------------------------------------------------------- */
+/* Four open loops turning about their centre. It covers the page until the
+   shell drops data-loading, and the arrival sequence waits beneath it. */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: var(--ground);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.45s var(--ease),
+    visibility 0s 0.45s;
+}
+
+.shell[data-loading] .loader {
+  opacity: 1;
+  visibility: visible;
+  transition: none;
+}
+
+.loader svg {
+  width: 76px;
+  height: 76px;
+  overflow: visible;
+}
+
+.loaderMark {
+  fill: none;
+  stroke: var(--olive);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  animation: turn 2.4s linear infinite;
+}
+
+.shell[data-loading] :is(.part, .rise, .bar, .ask) {
+  animation-play-state: paused;
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ---- Bar ------------------------------------------------------------------ */
 
 .bar {
@@ -664,6 +712,10 @@
   .bar,
   .ask {
     animation: none;
+  }
+
+  .loaderMark {
+    animation-duration: 12s;
   }
 }
 

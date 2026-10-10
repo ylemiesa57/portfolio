@@ -5,10 +5,18 @@
 
 export const OPENROUTER_URL =
   process.env.OPENROUTER_URL || "https://openrouter.ai/api/v1/chat/completions";
-// Defaults to a genuinely free OpenRouter model. Swap to a paid model (e.g.
-// "qwen/qwen3-30b-a3b") once there are credits on the OpenRouter account —
-// this one was picked because it actually returned results with a $0 balance.
-export const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || "openai/gpt-oss-20b:free";
+// Defaults to a free OpenRouter model, picked because it answered the Ask and
+// router prompts in about a second on a key with no spend (checked
+// 2026-10-10). Free models come and go, so the request also names fallbacks
+// that OpenRouter tries in order when the first is gone or rate-limited.
+export const OPENROUTER_MODEL =
+  process.env.OPENROUTER_MODEL || "nvidia/nemotron-3-super-120b-a12b:free";
+const FALLBACK_MODELS = (
+  process.env.OPENROUTER_FALLBACK_MODELS || "liquid/lfm-2.5-2.6b:free,apodex/apodex-1.1-mini:free"
+)
+  .split(",")
+  .map((m) => m.trim())
+  .filter((m) => m && m !== OPENROUTER_MODEL);
 
 /** Thrown when OpenRouter can't be reached, or no API key is configured. */
 export class LLMUnreachableError extends Error {
@@ -48,6 +56,7 @@ export async function chatComplete(
       },
       body: JSON.stringify({
         model: OPENROUTER_MODEL,
+        ...(FALLBACK_MODELS.length ? { models: [OPENROUTER_MODEL, ...FALLBACK_MODELS] } : {}),
         temperature: opts?.temperature ?? 0.2,
         // Generous ceiling: reasoning-capable free models spend a chunk of
         // their completion budget on hidden reasoning tokens before the
