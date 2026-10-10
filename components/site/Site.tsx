@@ -428,7 +428,9 @@ export default function Site({ data }: { data: SiteData }) {
               </p>
             </div>
             <figure className={`${styles.portrait} ${styles.rise}`} style={{ animationDelay: "900ms" }}>
-              <Image src={data.portrait} alt={`Portrait of ${data.name}`} width={512} height={512} sizes="176px" priority />
+              {/* Served as the file itself: the image optimizer route is not
+                  reachable behind this project's service rewrites. */}
+              <Image src={data.portrait} alt={`Portrait of ${data.name}`} width={400} height={400} priority unoptimized />
             </figure>
           </div>
         ) : null}
