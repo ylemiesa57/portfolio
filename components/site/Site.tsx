@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sectionById, sectionForNode } from "@/lib/sections";
 import type { Citation } from "@/lib/ask";
 import type { StatusPayload } from "@/app/api/status/route";
+import Graph from "./Graph";
 import Loader from "./Loader";
 import Reveal from "./Reveal";
 import { useAsk, type StageRecord } from "./useAsk";
@@ -339,7 +340,7 @@ export default function Site({ data }: { data: SiteData }) {
   };
 
   // A citation opens the page that proves it, on the entry it names.
-  const cite = (c: Citation) => {
+  const cite = (c: Pick<Citation, "id" | "type" | "sectionId">) => {
     const target = VIEW_OF_SECTION[sectionForNode(c)] ?? "about";
     const slug = c.id.slice(c.id.indexOf(":") + 1);
     const lists: Partial<Record<View, Entry[]>> = {
@@ -510,6 +511,7 @@ export default function Site({ data }: { data: SiteData }) {
         ) : null}
 
         {view === "ask" ? (
+          <div className={styles.asked}>
           <div className={styles.answer} aria-live="polite">
             {state.status === "idle" ? (
               <>
@@ -594,6 +596,16 @@ export default function Site({ data }: { data: SiteData }) {
                 ) : null}
               </>
             )}
+          </div>
+          {state.status === "done" && result?.grounded && result.subgraph ? (
+            <Graph
+              key={state.question}
+              nodes={result.subgraph.nodes}
+              edges={result.subgraph.edges}
+              seedIds={result.citations.map((c) => c.id)}
+              onOpen={cite}
+            />
+          ) : null}
           </div>
         ) : null}
       </main>
