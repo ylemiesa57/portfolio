@@ -415,8 +415,129 @@
 
 /* ---- Answer ----------------------------------------------------------------- */
 
+/* The answer on the left; on a screen with room, the subgraph it was written
+   from on the right. */
+.stage[data-view="ask"] {
+  align-content: stretch;
+}
+
+.asked {
+  display: grid;
+  grid-template-columns: minmax(0, 42rem) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  min-height: 0;
+}
+
 .answer {
   max-width: 42rem;
+}
+
+.graph {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  animation: settle 0.7s var(--ease) 0.4s both;
+}
+
+.graph svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  touch-action: none;
+}
+
+.graphNote {
+  position: absolute;
+  inset: auto 0 0 auto;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--soft);
+  text-align: right;
+}
+
+.graphEdge {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  transition: stroke 0.2s ease-out;
+}
+
+.graphEdge[data-lit] {
+  stroke: var(--accent);
+}
+
+.graphNode {
+  cursor: grab;
+  animation: settle 0.5s var(--ease) both;
+}
+
+.graphNode:active {
+  cursor: grabbing;
+}
+
+.graphNode:focus {
+  outline: none;
+}
+
+.graphHit {
+  fill: transparent;
+}
+
+.graphDot {
+  fill: var(--ground);
+  stroke: var(--ink);
+  stroke-width: 1.25;
+  transition:
+    fill 0.2s ease-out,
+    stroke 0.2s ease-out;
+}
+
+.graphNode[data-seed] .graphDot {
+  fill: var(--ink);
+}
+
+.graphNode text {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  fill: var(--soft);
+  paint-order: stroke;
+  stroke: var(--ground);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  user-select: none;
+  transition: fill 0.2s ease-out;
+}
+
+.graphNode[data-seed] text {
+  fill: var(--ink);
+}
+
+.graphNode:hover text,
+.graphNode:focus-visible text {
+  fill: var(--accent);
+}
+
+.graphNode:hover .graphDot,
+.graphNode:focus-visible .graphDot {
+  stroke: var(--accent);
+}
+
+.graphNode[data-seed]:hover .graphDot,
+.graphNode[data-seed]:focus-visible .graphDot {
+  fill: var(--accent);
+}
+
+/* Without room beside the answer the list of sources stands alone. */
+@media (max-width: 1020px), (max-height: 560px) {
+  .asked {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .graph {
+    display: none;
+  }
 }
 
 .question {
@@ -716,6 +837,11 @@
 
   .loaderMark {
     animation-duration: 12s;
+  }
+
+  .graph,
+  .graphNode {
+    animation: none;
   }
 }
 
