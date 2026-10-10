@@ -251,7 +251,6 @@ const STAGE_LABEL: Record<StageRecord["stage"], string> = {
 
 function statusNote(status: StatusPayload | null): string | null {
   if (!status) return null;
-  if (!status.graph.ok) return "The graph is offline, so answers point to a page instead.";
   if (!status.model.configured) return "The language model isn't configured, so Ask can't answer right now.";
   return null;
 }
