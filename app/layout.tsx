@@ -38,7 +38,13 @@ export default function RootLayout({
     // trips a hydration mismatch. This suppresses only attribute-level noise on
     // these two elements, not real mismatches inside the app.
     <html lang="en" className={`${stix.variable} ${archivo.variable}`} suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        {/* The loader is lifted by script; without script it must not hold the page. */}
+        <noscript>
+          <style>{`[data-loader]{display:none!important}[data-loading] *{animation-play-state:running!important}`}</style>
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }

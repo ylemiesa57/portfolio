@@ -39,3 +39,4 @@ backend/.venv/
 .claude/settings.local.json
 .impeccable/review/
 .impeccable/questions/
+.vercel

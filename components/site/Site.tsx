@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { sectionById, sectionForNode } from "@/lib/sections";
 import type { Citation } from "@/lib/ask";
 import type { StatusPayload } from "@/app/api/status/route";
+import Loader from "./Loader";
 import Reveal from "./Reveal";
 import { useAsk, type StageRecord } from "./useAsk";
 import styles from "./site.module.css";
@@ -275,6 +276,20 @@ export default function Site({ data }: { data: SiteData }) {
   // same sequence plays quickly.
   const [later, setLater] = useState(false);
   const main = useRef<HTMLElement>(null);
+  // The loader holds the screen until the type is in, and for long enough to
+  // be seen turning; the arrival sequence waits underneath it.
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    let alive = true;
+    Promise.all([Promise.race([document.fonts.ready, wait(2500)]), wait(1100)]).then(() => {
+      if (alive) setLoading(false);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     const moved = () => setLater(true);
@@ -343,7 +358,8 @@ export default function Site({ data }: { data: SiteData }) {
   const note = statusNote(status);
 
   return (
-    <div className={styles.shell} data-later={later ? "" : undefined}>
+    <div className={styles.shell} data-later={later ? "" : undefined} data-loading={loading ? "" : undefined}>
+      <Loader />
       {/* The address's hash names the view, so the skip link moves focus
           itself instead of navigating. */}
       <a
